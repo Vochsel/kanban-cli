@@ -9,14 +9,21 @@ export interface Column {
   id: string;
   title: string;
   cards: Card[];
+  icon?: string;
 }
 
 export interface Board {
   columns: Column[];
+  title?: string;
+  theme?: string;
 }
 
 const headingPattern = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
 const checkboxPattern = /^\s*[-*+]\s+\[( |x|X)\]\s+(.+?)\s*$/;
+const frontmatterPattern = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
+const columnIconPattern = /<!--\s*icon\s*:\s*([\w-]+)\s*-->/i;
+const themePattern = /^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/;
+const iconNamePattern = /^[a-z][a-z0-9-]*$/;
 
 export function createDefaultBoard(): Board {
   return {
@@ -48,20 +55,25 @@ export function createDefaultBoard(): Board {
 }
 
 export function parseMarkdown(markdown: string): Board {
+  const { meta, body } = stripFrontmatter(markdown);
   const columns: Column[] = [];
   const columnIds = new Map<string, number>();
   const cardIds = new Map<string, number>();
   let currentColumn: Column | undefined;
 
-  for (const line of markdown.split(/\r?\n/)) {
+  for (const line of body.split(/\r?\n/)) {
     const heading = line.match(headingPattern);
 
     if (heading) {
-      const title = cleanInlineText(heading[2]);
+      const headingBody = heading[2];
+      const iconMatch = headingBody.match(columnIconPattern);
+      const icon = iconMatch ? cleanIconName(iconMatch[1]) : undefined;
+      const title = cleanInlineText(headingBody.replace(columnIconPattern, ""));
       currentColumn = {
         id: uniqueId(`col-${slugify(title, "column")}`, columnIds),
         title: title || "Untitled",
-        cards: []
+        cards: [],
+        ...(icon ? { icon } : {})
       };
       columns.push(currentColumn);
       continue;
@@ -91,28 +103,39 @@ export function parseMarkdown(markdown: string): Board {
     });
   }
 
-  return columns.length > 0 ? { columns } : createDefaultBoard();
+  const board: Board = columns.length > 0 ? { columns } : createDefaultBoard();
+  const title = cleanInlineText(meta.title ?? "");
+  if (title) board.title = title;
+  const theme = cleanTheme(meta.theme);
+  if (theme) board.theme = theme;
+  return board;
 }
 
 export function serializeBoard(board: Board): string {
   const columns = board.columns.length > 0 ? board.columns : createDefaultBoard().columns;
-
-  return `${columns
+  const title = cleanInlineText(board.title ?? "");
+  const theme = cleanTheme(board.theme);
+  const frontmatter = renderFrontmatter(title, theme);
+  const body = columns
     .map((column) => {
-      const title = cleanInlineText(column.title) || "Untitled";
-      const lines = [`# ${title}`];
+      const columnTitle = cleanInlineText(column.title) || "Untitled";
+      const icon = cleanIconName(column.icon);
+      const heading = icon ? `# ${columnTitle} <!-- icon: ${icon} -->` : `# ${columnTitle}`;
+      const lines = [heading];
 
       for (const card of column.cards) {
         const cardTitle = cleanInlineText(card.title) || "Untitled";
         const cardDescription = cleanInlineText(card.description);
         const checkbox = card.done ? "x" : " ";
-        const body = cardDescription ? `${cardTitle}: ${cardDescription}` : cardTitle;
-        lines.push(`- [${checkbox}] ${body}`);
+        const cardBody = cardDescription ? `${cardTitle}: ${cardDescription}` : cardTitle;
+        lines.push(`- [${checkbox}] ${cardBody}`);
       }
 
       return lines.join("\n");
     })
-    .join("\n\n")}\n`;
+    .join("\n\n");
+
+  return `${frontmatter}${body}\n`;
 }
 
 export function normalizeBoard(input: unknown): Board {
@@ -125,6 +148,7 @@ export function normalizeBoard(input: unknown): Board {
     const title = cleanInlineText(typeof column.title === "string" ? column.title : "");
     const fallbackColumnId = `col-${slugify(title || `column-${columnIndex + 1}`, "column")}`;
     const id = uniqueId(cleanId(column.id, fallbackColumnId), columnIds);
+    const icon = cleanIconName(typeof column.icon === "string" ? column.icon : undefined);
     const rawCards = Array.isArray(column.cards) ? column.cards : [];
     const cards = rawCards.map((rawCard, cardIndex) => {
       const card = isRecord(rawCard) ? rawCard : {};
@@ -142,11 +166,17 @@ export function normalizeBoard(input: unknown): Board {
     return {
       id,
       title: title || "Untitled",
-      cards
+      cards,
+      ...(icon ? { icon } : {})
     };
   });
 
-  return columns.length > 0 ? { columns } : createDefaultBoard();
+  const board: Board = columns.length > 0 ? { columns } : createDefaultBoard();
+  const rawTitle = typeof source.title === "string" ? cleanInlineText(source.title) : "";
+  if (rawTitle) board.title = rawTitle;
+  const theme = cleanTheme(typeof source.theme === "string" ? source.theme : undefined);
+  if (theme) board.theme = theme;
+  return board;
 }
 
 function parseCardText(text: string): Pick<Card, "title" | "description"> {
@@ -164,6 +194,62 @@ function parseCardText(text: string): Pick<Card, "title" | "description"> {
     title: cleanInlineText(normalized.slice(0, separator)) || "Untitled",
     description: cleanInlineText(normalized.slice(separator + 1))
   };
+}
+
+function stripFrontmatter(input: string): { meta: Record<string, string>; body: string } {
+  const match = input.match(frontmatterPattern);
+  if (!match) return { meta: {}, body: input };
+
+  const meta: Record<string, string> = {};
+  for (const line of match[1].split(/\r?\n/)) {
+    const idx = line.indexOf(":");
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim();
+    if (!key) continue;
+    let value = line.slice(idx + 1).trim();
+    if (value.length >= 2) {
+      const first = value[0];
+      const last = value[value.length - 1];
+      if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+        value = value.slice(1, -1);
+      }
+    }
+    meta[key.toLowerCase()] = value;
+  }
+
+  return { meta, body: input.slice(match[0].length) };
+}
+
+function renderFrontmatter(title: string, theme: string | undefined): string {
+  const lines: string[] = [];
+  if (title) lines.push(`title: ${escapeFrontmatterValue(title)}`);
+  if (theme) lines.push(`theme: ${theme}`);
+  if (lines.length === 0) return "";
+  return `---\n${lines.join("\n")}\n---\n\n`;
+}
+
+function escapeFrontmatterValue(value: string): string {
+  if (/[:#'"\n]/.test(value)) {
+    return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  }
+  return value;
+}
+
+function cleanTheme(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  if (!themePattern.test(trimmed)) return undefined;
+  if (trimmed.length === 4) {
+    return `#${trimmed[1]}${trimmed[1]}${trimmed[2]}${trimmed[2]}${trimmed[3]}${trimmed[3]}`.toLowerCase();
+  }
+  return trimmed.toLowerCase();
+}
+
+function cleanIconName(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim().toLowerCase();
+  if (!trimmed || !iconNamePattern.test(trimmed)) return undefined;
+  return trimmed;
 }
 
 function cleanInlineText(value: string): string {

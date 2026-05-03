@@ -12,12 +12,21 @@ The browser UI runs on localhost, supports drag and drop across columns, writes 
 
 Requires Bun 1.3 or newer.
 
+Install globally from npm:
+
 ```sh
 npm install -g kanban-md
+```
+
+That adds the `kb` command to your shell:
+
+```sh
 kb board.md
 ```
 
-You can also run from a checkout:
+If the markdown file does not exist, `kb` creates a starter board and opens the local kanban UI.
+
+You can also run from a checkout without installing globally:
 
 ```sh
 bun install
@@ -70,7 +79,7 @@ bun run build
 bun run dev
 ```
 
-The package has no runtime dependencies. Bun serves the local API and browser app from the CLI process.
+The published CLI is bundled into `dist/cli.js`. Bun serves the local API and browser app from the CLI process.
 
 ## Publishing
 
