@@ -108,24 +108,12 @@ footer {
   letter-spacing: -0.01em;
 }
 
-.brand-dot {
-  background: var(--ink);
-  border-radius: 4px;
+.brand-mark {
+  color: var(--ink);
   display: inline-block;
-  height: 14px;
-  position: relative;
-  width: 14px;
-}
-
-.brand-dot::after {
-  background: #ffffff;
-  border-radius: 1.5px;
-  content: "";
-  height: 6px;
-  left: 4px;
-  position: absolute;
-  top: 4px;
-  width: 6px;
+  flex: 0 0 auto;
+  height: 16px;
+  width: 16px;
 }
 
 .nav-links {
