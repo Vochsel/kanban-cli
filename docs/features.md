@@ -19,6 +19,8 @@ When working through tasks here, always follow these defaults and check after st
 # Doing
 
 # Done
+- [x] release v0.2.3
+- [x] make sure license on www is same as https: //github.com/Vochsel/kanban-cli/blob/main/LICENSE
 - [x] move github to be next to npm button, and icons for both
 - [x] Improve the parallelism so that in progress changes from ui are merged neatly and nicely with any updates on disk from ai.: Do this auto merge and line by line
 - [x] Create a one click copy of prompt to install and run kanban-cli: prompt is like create or find todo markdown file, and then run npx start of kanban-cli@latest
