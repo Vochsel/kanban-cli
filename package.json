@@ -30,12 +30,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vochsel/kanban-md.git"
+    "url": "git+https://github.com/Vochsel/kanban-md.git"
   },
   "bugs": {
-    "url": "https://github.com/vochsel/kanban-md/issues"
+    "url": "https://github.com/Vochsel/kanban-md/issues"
   },
-  "homepage": "https://github.com/vochsel/kanban-md#readme",
+  "homepage": "https://github.com/Vochsel/kanban-md#readme",
   "publishConfig": {
     "access": "public"
   },
