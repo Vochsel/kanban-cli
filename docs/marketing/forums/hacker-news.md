@@ -12,7 +12,7 @@ Three angles for the same launch. Pick one for the title; the body can be reused
 
 I wanted a kanban board I could check into git with my code, edit in any text editor, and still drag-and-drop in a browser when I felt like it. So I built kanban-cli: a tiny Bun-powered CLI that serves a markdown file as a Trello-style board on localhost. Headings become columns, `- [ ] task: optional description` lines become cards. Every change in the browser writes back to the file in a canonical, diff-friendly format. File changes on disk live-reload in the browser.
 
-Around 1.7k LOC, no DB, no auth, no cloud. Install with `npm i -g kanban-cli`, then `kb board.md`. Repo: https://github.com/Vochsel/kanban-cli
+Around 1.7k LOC, no DB, no auth, no cloud. Run it inline with `npx kanban-cli@latest board.md` (or `bunx kanban-cli@latest board.md`) — no install needed. Repo: https://github.com/Vochsel/kanban-cli
 
 Feedback welcome — especially on the markdown round-trip rules and where it breaks.
 
@@ -28,7 +28,7 @@ If you already keep notes in markdown — Obsidian, vault folders, project READM
 
 It's careful about the round-trip: the writer emits a stable canonical format so git diffs are reviewable, and the parser preserves multi-line descriptions via indented continuation lines. Boards can carry an instructions block at the top of the file (great for handing off to AI assistants) — opt out with `--no-instructions`.
 
-Bun + zero external runtime deps. Repo: https://github.com/Vochsel/kanban-cli
+No install needed: `npx kanban-cli@latest TODO.md`. Bun + zero external runtime deps. Repo: https://github.com/Vochsel/kanban-cli
 
 ---
 
@@ -42,7 +42,7 @@ I kept asking Claude / Cursor to "implement the next thing on my list" and pasti
 
 The agent picks up the file, ticks items off, moves them to Done, and you watch the columns rearrange in the browser as it works. Because the source of truth is the markdown, you can edit alongside the agent without losing changes.
 
-`npm i -g kanban-cli`. Repo: https://github.com/Vochsel/kanban-cli
+Try it instantly: `npx kanban-cli@latest TODO.md`. Repo: https://github.com/Vochsel/kanban-cli
 
 ---
 

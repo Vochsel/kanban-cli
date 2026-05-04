@@ -11,7 +11,7 @@ Three short threads, each tuned for a different audience. Each lead post is ≤ 
 >
 > a markdown file → drag-and-drop kanban board on localhost. one Bun CLI, zero DB.
 >
-> `kb board.md` and you're in.
+> `npx kanban-cli@latest board.md` and you're in. no install.
 >
 > github.com/Vochsel/kanban-cli
 
@@ -36,7 +36,7 @@ Three short threads, each tuned for a different audience. Each lead post is ≤ 
 > the round-trip is the whole point. writer emits canonical, diff-friendly markdown. parser preserves multi-line descriptions. you can review board changes in a git PR without squinting.
 
 **Reply 2:**
-> drops nicely into an Obsidian vault, a project README, a notes folder. one CLI: `kb anything.md`.
+> drops nicely into an Obsidian vault, a project README, a notes folder. zero install: `npx kanban-cli@latest anything.md`.
 
 ---
 
@@ -47,7 +47,7 @@ Three short threads, each tuned for a different audience. Each lead post is ≤ 
 >
 > built kanban-cli: your todo list is a markdown kanban board. the board has a "copy prompt" button that hands the agent the file path + your custom instructions, then you watch it tick items off live.
 >
-> github.com/Vochsel/kanban-cli
+> `npx kanban-cli@latest TODO.md` — github.com/Vochsel/kanban-cli
 
 **Reply 1:**
 > the file IS the source of truth. agents read and write the same markdown you do. drag a card while it's working, no conflicts — the browser merges with what's on disk.

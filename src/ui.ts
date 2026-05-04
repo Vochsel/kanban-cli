@@ -17,10 +17,12 @@ import {
   Clock,
   Code,
   Database,
+  ExternalLink,
   Eye,
   File,
   Flag,
   Folder,
+  Globe,
   GripVertical,
   Heart,
   HelpCircle,
@@ -64,7 +66,12 @@ type RenderableIconNode = Array<[tag: string, attrs: SVGProps, children?: Render
 const browserIcons = {
   alignLeft: renderLucideIcon(AlignLeft),
   close: renderLucideIcon(X),
+  externalLink: renderLucideIcon(ExternalLink),
+  github: `<svg class="lucide-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.55v-2.05c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.69.08-.69 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.29 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.94 10.94 0 0 1 5.74 0c2.18-1.49 3.14-1.18 3.14-1.18.63 1.59.23 2.76.11 3.05.74.8 1.18 1.83 1.18 3.09 0 4.42-2.69 5.4-5.25 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.66.8.55C20.21 21.39 23.5 17.08 23.5 12c0-6.35-5.15-11.5-11.5-11.5z"/></svg>`,
+  globe: renderLucideIcon(Globe),
   grip: renderLucideIcon(GripVertical),
+  eye: renderLucideIcon(Eye),
+  info: renderLucideIcon(Info),
   link: renderLucideIcon(Link2),
   palette: renderLucideIcon(Palette),
   plus: renderLucideIcon(Plus),
@@ -986,6 +993,178 @@ export function renderAppShell(options: AppShellOptions): string {
       justify-content: flex-end;
     }
 
+    .settings-links {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .settings-link {
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      display: flex;
+      font-size: 13px;
+      gap: 10px;
+      padding: 10px 12px;
+      text-decoration: none;
+      transition: background-color 120ms ease, border-color 120ms ease;
+    }
+
+    .settings-link:hover {
+      background: var(--ink-hover, rgba(15, 15, 15, 0.04));
+      border-color: var(--line-strong, #d4d4d4);
+    }
+
+    .settings-link .lucide-icon {
+      color: var(--muted);
+      flex: 0 0 auto;
+    }
+
+    .settings-link-label {
+      font-weight: 500;
+    }
+
+    .settings-link-host {
+      color: var(--muted);
+      flex: 1 1 auto;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .settings-dialog {
+      max-width: min(760px, 94vw);
+    }
+
+    .settings-dialog-form {
+      display: grid;
+      gap: 0;
+      grid-template-columns: 180px 1fr;
+      max-height: min(560px, 80vh);
+      padding: 0;
+    }
+
+    .settings-nav {
+      background: rgba(15, 15, 15, 0.02);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 18px 14px;
+    }
+
+    .settings-nav-title {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      margin: 0 6px 8px;
+      text-transform: uppercase;
+    }
+
+    .settings-nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .settings-nav-item {
+      align-items: center;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      gap: 8px;
+      padding: 7px 10px;
+      text-align: left;
+      transition: background-color 120ms ease, color 120ms ease;
+    }
+
+    .settings-nav-item:hover {
+      background: rgba(15, 15, 15, 0.04);
+    }
+
+    .settings-nav-item.is-active {
+      background: var(--accent-soft, rgba(12, 102, 228, 0.1));
+      color: var(--accent, #0c66e4);
+    }
+
+    .settings-nav-item .lucide-icon,
+    .settings-nav-item svg {
+      flex: 0 0 auto;
+      height: 14px;
+      width: 14px;
+    }
+
+    .settings-main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .settings-main-head {
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      padding: 14px 18px;
+    }
+
+    .settings-main-heading {
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .settings-panel {
+      display: none;
+      overflow: auto;
+      padding: 18px 18px 20px;
+    }
+
+    .settings-panel.is-active {
+      display: flex;
+    }
+
+    @media (max-width: 560px) {
+      .settings-dialog-form {
+        grid-template-columns: 1fr;
+        max-height: 90vh;
+      }
+
+      .settings-nav {
+        border-bottom: 1px solid var(--line);
+        border-right: none;
+        flex-direction: row;
+        gap: 4px;
+        overflow-x: auto;
+        padding: 10px;
+      }
+
+      .settings-nav-title {
+        display: none;
+      }
+
+      .settings-nav-list {
+        flex-direction: row;
+      }
+
+      .settings-nav-item {
+        white-space: nowrap;
+      }
+    }
+
     .raw-dialog {
       max-width: min(720px, 92vw);
     }
@@ -1143,28 +1322,53 @@ export function renderAppShell(options: AppShellOptions): string {
       <textarea id="rawContent" class="card-dialog-description raw-content" readonly aria-label="Raw markdown content"></textarea>
     </form>
   </dialog>
-  <dialog id="settingsDialog" class="card-dialog" aria-labelledby="settingsDialogTitle">
-    <form method="dialog" class="card-dialog-form">
-      <header class="card-dialog-head">
-        <h2 id="settingsDialogTitle" class="card-dialog-heading">Board settings</h2>
-        <button type="submit" class="icon-button" aria-label="Close" title="Close">${browserIcons.close}</button>
-      </header>
-      <section class="settings-section">
-        <h3 class="settings-section-title">Instructions for AI assistants</h3>
-        <p class="settings-section-help">Written at the top of the markdown file. Clear the text to disable.</p>
-        <textarea id="settingsInstructions" class="card-dialog-description" placeholder="Add board-level instructions" aria-label="Board instructions"></textarea>
-        <div class="settings-actions">
-          <button type="button" class="ghost" id="settingsResetInstructions">Use default</button>
-          <button type="button" class="ghost" id="settingsClearInstructions">Clear</button>
-        </div>
-      </section>
-      <section class="settings-section">
-        <h3 class="settings-section-title">Raw markdown</h3>
-        <p class="settings-section-help">Inspect the file contents on disk.</p>
-        <div class="settings-actions" style="justify-content: flex-start">
-          <button type="button" class="ghost" id="settingsViewRaw">View raw markdown</button>
-        </div>
-      </section>
+  <dialog id="settingsDialog" class="card-dialog settings-dialog" aria-labelledby="settingsDialogTitle">
+    <form method="dialog" class="card-dialog-form settings-dialog-form">
+      <aside class="settings-nav" aria-label="Settings sections">
+        <h2 id="settingsDialogTitle" class="settings-nav-title">Settings</h2>
+        <nav class="settings-nav-list">
+          <button type="button" class="settings-nav-item is-active" data-settings-tab="instructions">${browserIcons.alignLeft}<span>Instructions</span></button>
+          <button type="button" class="settings-nav-item" data-settings-tab="markdown">${browserIcons.eye}<span>Markdown</span></button>
+          <button type="button" class="settings-nav-item" data-settings-tab="about">${browserIcons.info}<span>About</span></button>
+        </nav>
+      </aside>
+      <div class="settings-main">
+        <header class="settings-main-head">
+          <h3 class="settings-main-heading" data-settings-heading>Instructions</h3>
+          <button type="submit" class="icon-button" aria-label="Close" title="Close">${browserIcons.close}</button>
+        </header>
+        <section class="settings-section settings-panel is-active" data-settings-panel="instructions">
+          <p class="settings-section-help">Written at the top of the markdown file. Clear the text to disable.</p>
+          <textarea id="settingsInstructions" class="card-dialog-description" placeholder="Add board-level instructions" aria-label="Board instructions"></textarea>
+          <div class="settings-actions">
+            <button type="button" class="ghost" id="settingsResetInstructions">Use default</button>
+            <button type="button" class="ghost" id="settingsClearInstructions">Clear</button>
+          </div>
+        </section>
+        <section class="settings-section settings-panel" data-settings-panel="markdown">
+          <p class="settings-section-help">Inspect the file contents on disk.</p>
+          <div class="settings-actions" style="justify-content: flex-start">
+            <button type="button" class="ghost" id="settingsViewRaw">View raw markdown</button>
+          </div>
+        </section>
+        <section class="settings-section settings-panel" data-settings-panel="about">
+          <p class="settings-section-help">kanban-cli is open source. Star the repo or visit the site for docs.</p>
+          <div class="settings-links">
+            <a class="settings-link" href="https://github.com/Vochsel/kanban-cli" target="_blank" rel="noopener noreferrer">
+              ${browserIcons.github}
+              <span class="settings-link-label">GitHub repository</span>
+              <span class="settings-link-host">github.com/Vochsel/kanban-cli</span>
+              ${browserIcons.externalLink}
+            </a>
+            <a class="settings-link" href="https://kanban-cli.vochsel.com" target="_blank" rel="noopener noreferrer">
+              ${browserIcons.globe}
+              <span class="settings-link-label">Website</span>
+              <span class="settings-link-host">kanban-cli.vochsel.com</span>
+              ${browserIcons.externalLink}
+            </a>
+          </div>
+        </section>
+      </div>
     </form>
   </dialog>
   <dialog id="cardDialog" class="card-dialog" aria-labelledby="cardDialogTitle">
@@ -1231,7 +1435,7 @@ export function renderAppShell(options: AppShellOptions): string {
       const parts = [];
       const instructions = (state.board.instructions ?? "").trim();
       if (instructions) parts.push(instructions);
-      parts.push("Implement the items in the Todo column of this kanban board and check them off when done.");
+      parts.push("Work through every item in the Todo column one at a time, moving each into Doing before starting and to the top of Done when finished. Keep going to the next Todo item without stopping; only stop when the Todo column is empty.");
       parts.push("Board file: " + state.filePath);
       copyDeeplink(event.currentTarget, parts.join("\\n\\n"), "Prompt copied");
     });
@@ -1956,6 +2160,24 @@ export function renderAppShell(options: AppShellOptions): string {
     });
 
     settingsButtonEl.addEventListener("click", () => openSettingsDialog());
+
+    const settingsTabButtons = document.querySelectorAll("[data-settings-tab]");
+    const settingsPanels = document.querySelectorAll("[data-settings-panel]");
+    const settingsHeading = document.querySelector("[data-settings-heading]");
+    const settingsTabLabels = {
+      instructions: "Instructions",
+      markdown: "Markdown",
+      about: "About"
+    };
+    settingsTabButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tab = btn.getAttribute("data-settings-tab");
+        if (!tab) return;
+        settingsTabButtons.forEach((b) => b.classList.toggle("is-active", b === btn));
+        settingsPanels.forEach((p) => p.classList.toggle("is-active", p.getAttribute("data-settings-panel") === tab));
+        if (settingsHeading) settingsHeading.textContent = settingsTabLabels[tab] || tab;
+      });
+    });
 
     settingsInstructionsEl.addEventListener("input", () => {
       const value = settingsInstructionsEl.value.replace(/^\\s+|\\s+$/g, "");

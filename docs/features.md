@@ -1,24 +1,33 @@
 ---
 title: Features for Kanban
-theme: #0747a6
+theme: #1f845a
 ---
 
 When working through tasks here, always follow these defaults and check after starting or finishing a task:
 
 - Move a task into "Doing" section header before starting work on it
 - When you complete a task, move it to the top of the "Done" section header (sort by most recent at top of list)
+- Keep going forever until all todo's are done
 
 # Backlog
 - [ ] Potentially support yaml in parallel
-- [ ] Improve the parallelism so that in progress changes from ui are merged neatly and nicely with any updates on disk from ai.: Do this auto merge and line by line
+- [ ] Add labels/category support for cards
+- [ ] since we run from cli, we could have auto-implement: run claude -p or codex from cli to auto start, or tidy cards etc
 
 # Todo
 - [ ] Add support for space separated files to open multiple boards: show these in ui as selectable dropdown in top left on name of current board
 - [ ] add full darkmode support with toggle and override
+- [ ] Improve the parallelism so that in progress changes from ui are merged neatly and nicely with any updates on disk from ai.: Do this auto merge and line by line
+- [ ] add a opt-in feature that plays a sound in browser when cards move to doing, and then done: simple subtle sfx, done should be like a check success sound
+- [ ] add r.click context menu to all cards, and add copy deeplink off card into there: also add delete, copy text to clipboard, and edit description options to context menu
 
 # Doing
 
 # Done
+- [x] improve the ui of the settings dialog, add a simple sidebar on left
+- [x] add link to gh repo, and kanban-cli.vochsel.com to the settings dialog
+- [x] improve default instruction to keep going after doing each item until no more in todo column
+- [x] Update marketing posts for new inline npx kanban-cli@latest ...
 - [x] Make the dropzone of columns more forgiving
 - [x] Create an apps/www basic vite site that explains simply the purpose and use of this tool: Nicely designed and aesthetic, linking to the github.
 - [x] In docs/marketing/forums create a hacker news and twitter/x post to announce the creation of this: make 3 examples for 3 different audiences so we can see which works best

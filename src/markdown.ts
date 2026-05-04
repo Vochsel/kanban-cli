@@ -31,8 +31,9 @@ export const DEFAULT_INSTRUCTIONS = `When working through tasks here, follow the
 
 - Move a task into "Doing" section header before starting work on it
 - When you complete a task, move it to the top of the "Done" section header (sort by most recent at top of list)
+- Keep going to the next Todo item without stopping; only stop when the Todo column is empty
 
-Once complete, check markdown to see if new todo tasks are available.`;
+After each task, re-read the markdown to pick up any new Todo items that may have been added while you were working.`;
 
 export function createDefaultBoard(options?: { instructions?: string | false }): Board {
   const instructions = options?.instructions === false
