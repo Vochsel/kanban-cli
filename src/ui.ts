@@ -1143,35 +1143,39 @@ export function renderAppShell(options: AppShellOptions): string {
       border-radius: 6px;
       color: var(--ink);
       cursor: pointer;
-      display: flex;
+      display: grid;
       font-family: inherit;
       font-size: 13px;
       font-weight: 500;
       gap: 8px;
-      padding: 7px 10px;
+      grid-template-columns: 16px 1fr;
+      min-height: 32px;
+      padding: 0 10px;
       text-align: left;
       transition: background-color 120ms ease, color 120ms ease;
+      width: 100%;
     }
 
     .settings-nav-item:hover {
-      background: rgba(15, 15, 15, 0.04);
+      background: rgba(var(--ink-rgb), 0.05);
     }
 
     .settings-nav-item.is-active {
-      background: var(--accent-soft, rgba(12, 102, 228, 0.1));
-      color: var(--accent, #0c66e4);
+      background: var(--accent-soft);
+      color: var(--accent);
     }
 
     .settings-nav-item .lucide-icon,
     .settings-nav-item svg {
-      flex: 0 0 auto;
-      height: 14px;
-      width: 14px;
+      display: block;
+      height: 16px;
+      width: 16px;
     }
 
     .settings-main {
       display: flex;
       flex-direction: column;
+      min-height: 0;
       min-width: 0;
       overflow: hidden;
     }
@@ -1180,6 +1184,7 @@ export function renderAppShell(options: AppShellOptions): string {
       align-items: center;
       border-bottom: 1px solid var(--line);
       display: flex;
+      flex: 0 0 auto;
       gap: 8px;
       justify-content: space-between;
       padding: 14px 18px;
@@ -1194,12 +1199,20 @@ export function renderAppShell(options: AppShellOptions): string {
 
     .settings-panel {
       display: none;
+      flex: 1 1 auto;
+      flex-direction: column;
+      gap: 12px;
       overflow: auto;
       padding: 18px 18px 20px;
     }
 
     .settings-panel.is-active {
       display: flex;
+    }
+
+    .settings-panel #settingsInstructions {
+      flex: 1 1 auto;
+      min-height: 180px;
     }
 
     @media (max-width: 560px) {
@@ -2669,7 +2682,7 @@ export function renderAppShell(options: AppShellOptions): string {
         return "light";
       }
     }
-    function applyTheme(mode) {
+    function applyThemeMode(mode) {
       const resolved = resolvedTheme(mode);
       document.documentElement.setAttribute("data-theme", resolved);
       const themeToggleEl = document.querySelector("#themeToggle");
@@ -2685,9 +2698,9 @@ export function renderAppShell(options: AppShellOptions): string {
     }
     function setThemeMode(mode) {
       try { window.localStorage?.setItem(THEME_PREF_KEY, mode); } catch (_) { /* ignore */ }
-      applyTheme(mode);
+      applyThemeMode(mode);
     }
-    applyTheme(getThemeMode());
+    applyThemeMode(getThemeMode());
     document.querySelector("#themeToggle").addEventListener("click", () => {
       // Header toggle is an explicit override: flip whatever is current.
       const current = resolvedTheme(getThemeMode());
@@ -2701,7 +2714,7 @@ export function renderAppShell(options: AppShellOptions): string {
     try {
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
       const onSystemChange = () => {
-        if (getThemeMode() === "auto") applyTheme("auto");
+        if (getThemeMode() === "auto") applyThemeMode("auto");
       };
       if (mq.addEventListener) mq.addEventListener("change", onSystemChange);
       else if (mq.addListener) mq.addListener(onSystemChange);

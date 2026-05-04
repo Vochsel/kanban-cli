@@ -25,8 +25,9 @@ async function main(args: string[] = Bun.argv.slice(2)): Promise<void> {
 
   const running = await startWithPortFallback(options);
 
+  const version = await packageVersion();
   const fileLines = running.filePaths.map((p, i) => `  ${i === 0 ? "›" : " "} ${p}`).join("\n");
-  console.log(`kanban-cli is running
+  console.log(`kanban-cli v${version} is running
 ${running.filePaths.length > 1 ? `Boards (${running.filePaths.length}):\n${fileLines}` : `File: ${running.filePaths[0]}`}
 Board: ${running.url}
 Press Ctrl-C to stop.`);

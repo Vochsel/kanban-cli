@@ -1,6 +1,6 @@
 ---
 title: Features for Kanban
-theme: #1f845a
+theme: #4bce97
 ---
 
 When working through tasks here, always follow these defaults and check after starting or finishing a task:
@@ -9,16 +9,21 @@ When working through tasks here, always follow these defaults and check after st
 - When you complete a task, move it to the top of the "Done" section header (sort by most recent at top of list)
 - Keep going forever until all todo's are done
 
-# Backlog
+# Backlog <!-- icon: calendar -->
 - [ ] Potentially support yaml in parallel
 - [ ] Add labels/category support for cards
 - [ ] since we run from cli, we could have auto-implement: run claude -p or codex from cli to auto start, or tidy cards etc
 
 # Todo
+- [ ] add a changelog to the www page, and update dynamically based on git history, but human readable: stylize visually as its own kanban board, but columns per date released
+- [ ] change kanban-cli text on localhost kanban page to the favicon svg we created, and on click go to kanban-cli.vochsel.com
 
-# Doing
+# Doing <!-- icon: play -->
 
-# Done
+# Done <!-- icon: double-tick -->
+- [x] improve the settings dialog, the sidebar items should not be staggered, and make sure all tab item content is nicely laid out
+- [x] the color scheme of the board is not working anymore
+- [x] in terminal output when running, add a version output
 - [x] remove star on github as main cta on www
 - [x] release v0.2.3
 - [x] make sure license on www is same as https: //github.com/Vochsel/kanban-cli/blob/main/LICENSE
