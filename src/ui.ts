@@ -16,6 +16,7 @@ import {
   CircleDot,
   Clock,
   Code,
+  Copy,
   Database,
   ExternalLink,
   Eye,
@@ -52,6 +53,8 @@ import {
   Trash2,
   Trophy,
   Users,
+  Volume2,
+  VolumeX,
   X,
   Zap
 } from "lucide";
@@ -66,6 +69,7 @@ type RenderableIconNode = Array<[tag: string, attrs: SVGProps, children?: Render
 const browserIcons = {
   alignLeft: renderLucideIcon(AlignLeft),
   close: renderLucideIcon(X),
+  copy: renderLucideIcon(Copy),
   externalLink: renderLucideIcon(ExternalLink),
   github: `<svg class="lucide-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.55v-2.05c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.69.08-.69 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.29 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.94 10.94 0 0 1 5.74 0c2.18-1.49 3.14-1.18 3.14-1.18.63 1.59.23 2.76.11 3.05.74.8 1.18 1.83 1.18 3.09 0 4.42-2.69 5.4-5.25 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.66.8.55C20.21 21.39 23.5 17.08 23.5 12c0-6.35-5.15-11.5-11.5-11.5z"/></svg>`,
   globe: renderLucideIcon(Globe),
@@ -82,7 +86,9 @@ const browserIcons = {
   statusError: renderLucideIcon(CircleAlert),
   statusSaved: renderLucideIcon(CircleCheck),
   statusSaving: renderLucideIcon(LoaderCircle),
-  trash: renderLucideIcon(Trash2)
+  trash: renderLucideIcon(Trash2),
+  volume: renderLucideIcon(Volume2),
+  volumeMute: renderLucideIcon(VolumeX)
 } satisfies Record<string, string>;
 
 const columnIconChoices: Array<{ name: string; label: string; icon: IconNode }> = [
@@ -1165,6 +1171,94 @@ export function renderAppShell(options: AppShellOptions): string {
       }
     }
 
+    .settings-toggle {
+      align-items: center;
+      cursor: pointer;
+      display: flex;
+      font-size: 13px;
+      gap: 8px;
+      user-select: none;
+    }
+
+    .settings-toggle input[type="checkbox"] {
+      accent-color: var(--accent, #0c66e4);
+      cursor: pointer;
+      height: 16px;
+      width: 16px;
+    }
+
+    .settings-toggle-label {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .context-menu {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(9, 30, 66, 0.16), 0 0 1px rgba(9, 30, 66, 0.18);
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 200px;
+      padding: 4px;
+      position: fixed;
+      z-index: 1000;
+    }
+
+    .context-menu[hidden] {
+      display: none;
+    }
+
+    .context-menu-item {
+      align-items: center;
+      background: transparent;
+      border: none;
+      border-radius: 5px;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      font-family: inherit;
+      font-size: 13px;
+      gap: 8px;
+      padding: 6px 10px;
+      text-align: left;
+      transition: background-color 100ms ease, color 100ms ease;
+      width: 100%;
+    }
+
+    .context-menu-item:hover,
+    .context-menu-item:focus-visible {
+      background: rgba(15, 15, 15, 0.06);
+      outline: none;
+    }
+
+    .context-menu-item .lucide-icon {
+      color: var(--muted);
+      flex: 0 0 auto;
+      height: 14px;
+      width: 14px;
+    }
+
+    .context-menu-item-danger {
+      color: #b91c1c;
+    }
+
+    .context-menu-item-danger:hover,
+    .context-menu-item-danger:focus-visible {
+      background: rgba(220, 38, 38, 0.08);
+    }
+
+    .context-menu-item-danger .lucide-icon {
+      color: #b91c1c;
+    }
+
+    .context-menu-divider {
+      background: var(--line);
+      height: 1px;
+      margin: 3px 4px;
+    }
+
     .raw-dialog {
       max-width: min(720px, 92vw);
     }
@@ -1329,6 +1423,7 @@ export function renderAppShell(options: AppShellOptions): string {
         <nav class="settings-nav-list">
           <button type="button" class="settings-nav-item is-active" data-settings-tab="instructions">${browserIcons.alignLeft}<span>Instructions</span></button>
           <button type="button" class="settings-nav-item" data-settings-tab="markdown">${browserIcons.eye}<span>Markdown</span></button>
+          <button type="button" class="settings-nav-item" data-settings-tab="sounds">${browserIcons.volume}<span>Sounds</span></button>
           <button type="button" class="settings-nav-item" data-settings-tab="about">${browserIcons.info}<span>About</span></button>
         </nav>
       </aside>
@@ -1349,6 +1444,17 @@ export function renderAppShell(options: AppShellOptions): string {
           <p class="settings-section-help">Inspect the file contents on disk.</p>
           <div class="settings-actions" style="justify-content: flex-start">
             <button type="button" class="ghost" id="settingsViewRaw">View raw markdown</button>
+          </div>
+        </section>
+        <section class="settings-section settings-panel" data-settings-panel="sounds">
+          <p class="settings-section-help">Play a small sound when a card moves into Doing or Done. Off by default.</p>
+          <label class="settings-toggle">
+            <input type="checkbox" id="settingsSoundsToggle" />
+            <span class="settings-toggle-label">Enable move sounds</span>
+          </label>
+          <div class="settings-actions" style="justify-content: flex-start">
+            <button type="button" class="ghost" id="settingsSoundsPreviewDoing">Preview Doing</button>
+            <button type="button" class="ghost" id="settingsSoundsPreviewDone">Preview Done</button>
           </div>
         </section>
         <section class="settings-section settings-panel" data-settings-panel="about">
@@ -1383,6 +1489,13 @@ export function renderAppShell(options: AppShellOptions): string {
       </div>
     </form>
   </dialog>
+  <div id="cardContextMenu" class="context-menu" role="menu" aria-hidden="true" hidden>
+    <button type="button" class="context-menu-item" data-context-action="edit" role="menuitem">${browserIcons.alignLeft}<span>Edit description</span></button>
+    <button type="button" class="context-menu-item" data-context-action="copy-text" role="menuitem">${browserIcons.copy}<span>Copy text</span></button>
+    <button type="button" class="context-menu-item" data-context-action="copy-link" role="menuitem">${browserIcons.link}<span>Copy link</span></button>
+    <div class="context-menu-divider" role="separator"></div>
+    <button type="button" class="context-menu-item context-menu-item-danger" data-context-action="delete" role="menuitem">${browserIcons.trash}<span>Delete card</span></button>
+  </div>
   <script>
     const state = {
       board: { columns: [] },
@@ -1563,6 +1676,75 @@ export function renderAppShell(options: AppShellOptions): string {
       cardEl.draggable = !interactive;
     });
 
+    const contextMenuEl = document.querySelector("#cardContextMenu");
+    let contextMenuCardId = null;
+
+    function openContextMenu(cardId, x, y) {
+      contextMenuCardId = cardId;
+      contextMenuEl.hidden = false;
+      contextMenuEl.setAttribute("aria-hidden", "false");
+      // Measure to clamp inside viewport.
+      contextMenuEl.style.left = "0px";
+      contextMenuEl.style.top = "0px";
+      const menuRect = contextMenuEl.getBoundingClientRect();
+      const maxX = window.innerWidth - menuRect.width - 8;
+      const maxY = window.innerHeight - menuRect.height - 8;
+      contextMenuEl.style.left = Math.max(8, Math.min(x, maxX)) + "px";
+      contextMenuEl.style.top = Math.max(8, Math.min(y, maxY)) + "px";
+    }
+
+    function closeContextMenu() {
+      contextMenuEl.hidden = true;
+      contextMenuEl.setAttribute("aria-hidden", "true");
+      contextMenuCardId = null;
+    }
+
+    boardEl.addEventListener("contextmenu", (event) => {
+      const cardEl = event.target.closest(".card");
+      if (!cardEl) return;
+      event.preventDefault();
+      openContextMenu(cardEl.dataset.cardId, event.clientX, event.clientY);
+    });
+
+    contextMenuEl.addEventListener("click", (event) => {
+      const item = event.target.closest("[data-context-action]");
+      if (!item) return;
+      const action = item.dataset.contextAction;
+      const cardId = contextMenuCardId;
+      closeContextMenu();
+      if (!cardId) return;
+      const card = findCard(cardId);
+      if (!card) return;
+      const column = state.board.columns.find((c) => c.cards.some((x) => x.id === cardId));
+      if (action === "edit") {
+        openCardDialog(cardId);
+      } else if (action === "copy-text") {
+        const parts = [card.title || ""];
+        if ((card.description ?? "").trim()) parts.push("", card.description.trim());
+        copyText(parts.join("\\n"), "Card text copied");
+      } else if (action === "copy-link") {
+        copyText(buildDeeplinkUrl("#card=" + cardId), "Card link copied");
+      } else if (action === "delete") {
+        if (column) deleteCard(column.id, cardId);
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (contextMenuEl.hidden) return;
+      if (event.target.closest("#cardContextMenu")) return;
+      closeContextMenu();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !contextMenuEl.hidden) {
+        closeContextMenu();
+      }
+    });
+
+    window.addEventListener("scroll", closeContextMenu, true);
+    window.addEventListener("blur", closeContextMenu);
+    window.addEventListener("resize", closeContextMenu);
+
     boardEl.addEventListener("dragstart", (event) => {
       const columnHandle = event.target.closest(".column-grip");
 
@@ -1578,6 +1760,11 @@ export function renderAppShell(options: AppShellOptions): string {
       if (event.target.classList && event.target.classList.contains("card")) {
         const cardEl = event.target;
         state.dragType = "card";
+        const sourceColumnEl = cardEl.closest(".column");
+        state.dragSnapshot = {
+          cardId: cardEl.dataset.cardId,
+          sourceColumnId: sourceColumnEl ? sourceColumnEl.dataset.columnId : null
+        };
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.setData("text/plain", cardEl.dataset.cardId);
         requestAnimationFrame(() => cardEl.classList.add("card-dragging"));
@@ -1627,6 +1814,9 @@ export function renderAppShell(options: AppShellOptions): string {
 
     boardEl.addEventListener("dragend", () => {
       const changed = Boolean(state.dragType);
+      const wasCardDrag = state.dragType === "card";
+      const snapshot = state.dragSnapshot;
+      state.dragSnapshot = null;
       boardEl.querySelectorAll(".card-dragging, .column-dragging").forEach((el) => {
         el.classList.remove("card-dragging", "column-dragging");
       });
@@ -1636,6 +1826,15 @@ export function renderAppShell(options: AppShellOptions): string {
         syncStateFromDom();
         renderBoard();
         saveNow();
+
+        if (wasCardDrag && snapshot && snapshot.cardId) {
+          const newColumn = state.board.columns.find((c) => c.cards.some((card) => card.id === snapshot.cardId));
+          if (newColumn && newColumn.id !== snapshot.sourceColumnId) {
+            const title = (newColumn.title || "").trim().toLowerCase();
+            if (title === "doing") playMoveDoingSound();
+            else if (title === "done") playMoveDoneSound();
+          }
+        }
       }
     });
 
@@ -1874,10 +2073,9 @@ export function renderAppShell(options: AppShellOptions): string {
       title.rows = 1;
       title.setAttribute("aria-label", "Card title");
 
-      const link = button("", "icon-button copy-link copy-card-link", "Copy link to card", "link");
       const remove = button("", "icon-button delete-card", "Delete card", "trash");
 
-      top.append(check, title, link, remove);
+      top.append(check, title, remove);
       cardEl.append(top);
 
       if ((card.description ?? "").trim()) {
@@ -2167,6 +2365,7 @@ export function renderAppShell(options: AppShellOptions): string {
     const settingsTabLabels = {
       instructions: "Instructions",
       markdown: "Markdown",
+      sounds: "Sounds",
       about: "About"
     };
     settingsTabButtons.forEach((btn) => {
@@ -2177,6 +2376,65 @@ export function renderAppShell(options: AppShellOptions): string {
         settingsPanels.forEach((p) => p.classList.toggle("is-active", p.getAttribute("data-settings-panel") === tab));
         if (settingsHeading) settingsHeading.textContent = settingsTabLabels[tab] || tab;
       });
+    });
+
+    const SOUND_PREF_KEY = "kanban-cli:sounds-enabled";
+    let soundsEnabled = false;
+    try {
+      soundsEnabled = window.localStorage?.getItem(SOUND_PREF_KEY) === "1";
+    } catch (_) { /* localStorage unavailable */ }
+    const soundsToggleEl = document.querySelector("#settingsSoundsToggle");
+    soundsToggleEl.checked = soundsEnabled;
+    soundsToggleEl.addEventListener("change", () => {
+      soundsEnabled = soundsToggleEl.checked;
+      try { window.localStorage?.setItem(SOUND_PREF_KEY, soundsEnabled ? "1" : "0"); } catch (_) { /* ignore */ }
+    });
+
+    let _audioCtx = null;
+    function getAudioCtx() {
+      if (!_audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (Ctx) _audioCtx = new Ctx();
+      }
+      return _audioCtx;
+    }
+
+    function playTone(freq, duration, volume, type) {
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
+      const t0 = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type || "sine";
+      osc.frequency.setValueAtTime(freq, t0);
+      gain.gain.setValueAtTime(0, t0);
+      gain.gain.linearRampToValueAtTime(volume, t0 + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t0);
+      osc.stop(t0 + duration + 0.04);
+    }
+
+    function playMoveDoingSound() {
+      if (!soundsEnabled) return;
+      playTone(560, 0.14, 0.08, "sine");
+    }
+
+    function playMoveDoneSound() {
+      if (!soundsEnabled) return;
+      // Two ascending tones — a check/success cue.
+      playTone(660, 0.10, 0.08, "sine");
+      setTimeout(() => playTone(990, 0.20, 0.10, "sine"), 90);
+    }
+
+    document.querySelector("#settingsSoundsPreviewDoing").addEventListener("click", () => {
+      // Preview ignores the enabled flag so the user can hear before turning it on.
+      playTone(560, 0.14, 0.08, "sine");
+    });
+    document.querySelector("#settingsSoundsPreviewDone").addEventListener("click", () => {
+      playTone(660, 0.10, 0.08, "sine");
+      setTimeout(() => playTone(990, 0.20, 0.10, "sine"), 90);
     });
 
     settingsInstructionsEl.addEventListener("input", () => {
@@ -2438,6 +2696,27 @@ export function renderAppShell(options: AppShellOptions): string {
 
     function buildDeeplinkUrl(hash) {
       return location.origin + location.pathname + location.search + (hash || "");
+    }
+
+    async function copyText(text, message) {
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          textarea.remove();
+        }
+        setStatus(message, "saved");
+      } catch (error) {
+        console.error(error);
+        setStatus("Copy failed", "error");
+      }
     }
 
     async function copyDeeplink(buttonEl, url, message) {
