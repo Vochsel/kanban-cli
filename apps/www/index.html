@@ -33,8 +33,11 @@
 
     <main>
       <section class="hero">
-        <span class="eyebrow">v0.2.0 · open source · MIT</span>
-        <h1>Your kanban board is<br /><span class="hl">just a markdown file.</span></h1>
+        <span class="eyebrow">v0.2.1 · open source · MIT</span>
+        <h1>
+          <span class="hero-line">Your kanban board is</span>
+          <span class="hero-line hl">just a markdown file.</span>
+        </h1>
         <p class="lede">
           A tiny Bun-powered CLI that opens any <code>.md</code> file as a local, drag-and-drop kanban board.
           Edit in the browser, edit in your editor — both stay in sync, every change writes back to the file.
@@ -50,9 +53,9 @@
             Star on GitHub
           </a>
         </div>
-        <p class="hero-sub">No install required — runs directly from npm.</p>
+        <p class="hero-sub">Try it below — these previews are real, just no disk.</p>
 
-        <div class="hero-preview" aria-hidden="true">
+        <div class="hero-preview">
           <div class="kp-window">
             <div class="kp-titlebar">
               <span class="kp-dot kp-dot-r"></span>
@@ -60,41 +63,7 @@
               <span class="kp-dot kp-dot-g"></span>
               <span class="kp-url">localhost:4177 — board.md</span>
             </div>
-            <div class="kp-board">
-              <div class="kp-col">
-                <div class="kp-col-head"><span class="kp-col-icon"></span><span>Todo</span></div>
-                <div class="kp-card">
-                  <span class="kp-check"></span>
-                  <span>Wire AI prompt</span>
-                </div>
-                <div class="kp-card">
-                  <span class="kp-check"></span>
-                  <span>Ship 0.2.0 release</span>
-                </div>
-                <div class="kp-card">
-                  <span class="kp-check"></span>
-                  <span>Polish description dialog</span>
-                </div>
-              </div>
-              <div class="kp-col">
-                <div class="kp-col-head"><span class="kp-col-icon kp-col-icon-doing"></span><span>Doing</span></div>
-                <div class="kp-card kp-card-active">
-                  <span class="kp-check"></span>
-                  <span>Drag and drop everything</span>
-                </div>
-              </div>
-              <div class="kp-col">
-                <div class="kp-col-head"><span class="kp-col-icon kp-col-icon-done"></span><span>Done</span></div>
-                <div class="kp-card kp-card-done">
-                  <span class="kp-check kp-check-done"></span>
-                  <span>Parse markdown into columns</span>
-                </div>
-                <div class="kp-card kp-card-done">
-                  <span class="kp-check kp-check-done"></span>
-                  <span>Round-trip to disk</span>
-                </div>
-              </div>
-            </div>
+            <div class="kp-board" data-board="hero"></div>
           </div>
         </div>
       </section>
@@ -157,65 +126,52 @@
               <a class="btn btn-primary" href="https://github.com/Vochsel/kanban-cli#install" target="_blank" rel="noopener">Read the install guide</a>
             </div>
           </div>
-          <div class="qs-terminal">
-            <div class="qs-terminal-bar">
-              <span class="kp-dot kp-dot-r"></span>
-              <span class="kp-dot kp-dot-y"></span>
-              <span class="kp-dot kp-dot-g"></span>
+          <div class="qs-stage" data-qs-stage>
+            <div class="qs-terminal" data-qs-terminal>
+              <div class="qs-terminal-bar">
+                <span class="kp-dot kp-dot-r"></span>
+                <span class="kp-dot kp-dot-y"></span>
+                <span class="kp-dot kp-dot-g"></span>
+                <span class="qs-terminal-title">~/projects</span>
+              </div>
+              <div class="qs-terminal-body" data-qs-body>
+                <div class="qs-line"><span class="qs-comment"># run instantly — type a command and press enter</span></div>
+                <div class="qs-prompt-line">
+                  <span class="qs-prompt">$</span>
+                  <input
+                    class="qs-input"
+                    type="text"
+                    spellcheck="false"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    value="npx kanban-cli@latest board.md"
+                    aria-label="Try the kanban-cli command"
+                    data-qs-input
+                  />
+                </div>
+              </div>
             </div>
-            <pre><code><span class="qs-comment"># run instantly</span>
-<span class="qs-prompt">$</span> npx kanban-cli@latest board.md
-<span class="qs-comment">▸ kanban-cli is running</span>
-<span class="qs-comment">▸ File:  /Users/you/board.md</span>
-<span class="qs-comment">▸ Board: http://127.0.0.1:4177</span>
-
-<span class="qs-comment"># or with bun</span>
-<span class="qs-prompt">$</span> bunx kanban-cli@latest board.md
-
-<span class="qs-comment"># or install globally as `kb`</span>
-<span class="qs-prompt">$</span> npm i -g kanban-cli
-<span class="qs-prompt">$</span> kb board.md</code></pre>
+            <div class="qs-browser" data-qs-browser hidden>
+              <div class="qs-browser-bar">
+                <span class="kp-dot kp-dot-r"></span>
+                <span class="kp-dot kp-dot-y"></span>
+                <span class="kp-dot kp-dot-g"></span>
+                <span class="qs-browser-url">http://127.0.0.1:4177</span>
+              </div>
+              <div class="kp-board kp-board-mini" data-board="quickstart"></div>
+            </div>
           </div>
         </div>
       </section>
 
       <section class="format">
         <h2 class="section-title">The shape of a board.</h2>
-        <p class="section-lede">Headings turn into columns. Checkbox lines turn into cards. The bit before the first heading becomes a global instruction block — handy for handing off to AI assistants.</p>
+        <p class="section-lede">Headings turn into columns. Checkbox lines turn into cards. Edit either side — they stay in sync.</p>
         <div class="format-grid">
-          <pre class="format-pre"><code>When working through tasks here:
-
-- Move a task into "Doing"
-  before starting work on it
-- When done, move it to the
-  top of "Done"
-
-# Todo
-- [ ] Add CLI: serve a local board
-- [ ] Polish UI: feel good
-
-# Doing
-- [ ] Wire npm publish
-
-# Done
-- [x] Headings become columns</code></pre>
+          <textarea class="format-pre" data-md-source spellcheck="false" aria-label="Markdown source"></textarea>
           <div class="format-arrow" aria-hidden="true">→</div>
           <div class="format-render">
-            <div class="kp-board kp-board-mini">
-              <div class="kp-col">
-                <div class="kp-col-head"><span class="kp-col-icon"></span><span>Todo</span></div>
-                <div class="kp-card"><span class="kp-check"></span>Add CLI</div>
-                <div class="kp-card"><span class="kp-check"></span>Polish UI</div>
-              </div>
-              <div class="kp-col">
-                <div class="kp-col-head"><span class="kp-col-icon kp-col-icon-doing"></span><span>Doing</span></div>
-                <div class="kp-card"><span class="kp-check"></span>Wire npm publish</div>
-              </div>
-              <div class="kp-col">
-                <div class="kp-col-head"><span class="kp-col-icon kp-col-icon-done"></span><span>Done</span></div>
-                <div class="kp-card kp-card-done"><span class="kp-check kp-check-done"></span>Headings become columns</div>
-              </div>
-            </div>
+            <div class="kp-board kp-board-mini" data-board="format"></div>
           </div>
         </div>
       </section>

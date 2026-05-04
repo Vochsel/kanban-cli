@@ -239,12 +239,16 @@ main {
 }
 
 .hero h1 {
-  font-size: clamp(40px, 6vw, 76px);
+  font-size: clamp(36px, 5.4vw, 72px);
   font-weight: 800;
   letter-spacing: -0.035em;
-  line-height: 1.02;
+  line-height: 1.04;
   margin: 22px auto 24px;
-  max-width: 14ch;
+}
+
+.hero-line {
+  display: block;
+  white-space: nowrap;
 }
 
 .hl {
@@ -378,17 +382,65 @@ main {
 .kp-card {
   align-items: center;
   background: var(--surface);
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
+  cursor: grab;
   display: flex;
   font-size: 13px;
   font-weight: 500;
   gap: 8px;
   padding: 10px 12px;
+  transition: border-color 120ms ease, box-shadow 120ms ease, opacity 120ms ease, transform 120ms ease;
+}
+
+.kp-card:hover {
+  border-color: var(--line-strong);
+}
+
+.kp-card:hover .kp-del {
+  opacity: 1;
+}
+
+.kp-card-dragging {
+  cursor: grabbing;
+  opacity: 0.4;
+  transform: rotate(-1deg);
+}
+
+.kp-card-text {
+  flex: 1 1 auto;
+  outline: none;
+  min-width: 0;
+}
+
+.kp-card-text:focus {
+  background: var(--accent-soft);
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px var(--accent-soft);
+  padding: 0 4px;
+  margin: 0 -4px;
+}
+
+.kp-col-title {
+  outline: none;
+}
+
+.kp-col-title:focus {
+  background: var(--accent-soft);
+  border-radius: 3px;
+  padding: 0 4px;
+  margin: 0 -4px;
+}
+
+.kp-col-drop {
+  background: rgba(12, 102, 228, 0.08);
+  outline: 2px dashed var(--accent);
+  outline-offset: -4px;
 }
 
 .kp-card-active {
-  border: 1px solid var(--accent);
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow-sm);
 }
 
@@ -396,12 +448,25 @@ main {
   color: var(--muted);
 }
 
+.kp-card-done .kp-card-text {
+  text-decoration: line-through;
+  text-decoration-color: var(--muted-soft);
+}
+
 .kp-check {
+  background: var(--surface);
   border: 1.5px solid var(--line-strong);
   border-radius: 3px;
+  cursor: pointer;
   flex: 0 0 auto;
   height: 14px;
+  padding: 0;
+  transition: background-color 120ms ease, border-color 120ms ease;
   width: 14px;
+}
+
+.kp-check:hover {
+  border-color: var(--accent);
 }
 
 .kp-check-done {
@@ -422,9 +487,47 @@ main {
   width: 3px;
 }
 
-.kp-card-done .kp-check {
-  background: var(--accent);
-  border-color: var(--accent);
+.kp-del {
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: var(--muted-soft);
+  cursor: pointer;
+  flex: 0 0 auto;
+  font-size: 16px;
+  height: 18px;
+  line-height: 1;
+  margin-left: auto;
+  opacity: 0;
+  padding: 0;
+  transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
+  width: 18px;
+}
+
+.kp-del:hover {
+  background: rgba(220, 38, 38, 0.1);
+  color: #b91c1c;
+}
+
+.kp-add {
+  background: transparent;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
+  padding: 8px 10px;
+  text-align: left;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.kp-add:hover {
+  background: rgba(15, 15, 15, 0.03);
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 /* Section base ---------------------------------------------------------- */
@@ -522,6 +625,13 @@ section {
   margin-top: 8px;
 }
 
+.qs-stage {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+  transition: gap 200ms ease;
+}
+
 .qs-terminal {
   background: #0a0a0a;
   border-radius: var(--radius-lg);
@@ -530,27 +640,117 @@ section {
 }
 
 .qs-terminal-bar {
+  align-items: center;
   background: #1a1a1a;
   display: flex;
   gap: 6px;
   padding: 12px 16px;
 }
 
-.qs-terminal pre {
+.qs-terminal-title {
+  color: #888;
+  flex: 1 1 auto;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  text-align: center;
+}
+
+.qs-terminal-body {
   color: #f5f5f5;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 13.5px;
   line-height: 1.7;
   padding: 22px 24px;
+  min-height: 200px;
+}
+
+.qs-line,
+.qs-prompt-line {
+  display: flex;
+  gap: 6px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.qs-line-out {
+  animation: qs-fade-in 220ms ease both;
+  color: #cfcfcf;
+}
+
+@keyframes qs-fade-in {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: none; }
 }
 
 .qs-prompt {
   color: var(--green);
+  flex: 0 0 auto;
   font-weight: 600;
-  margin-right: 4px;
 }
 
 .qs-comment {
   color: #888;
+}
+
+.qs-input {
+  background: transparent;
+  border: none;
+  caret-color: #f5f5f5;
+  color: #f5f5f5;
+  flex: 1 1 auto;
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+  padding: 0;
+}
+
+.qs-input::placeholder {
+  color: #555;
+}
+
+.qs-input::selection {
+  background: rgba(31, 132, 90, 0.4);
+}
+
+.qs-input-frozen {
+  color: #f5f5f5;
+}
+
+.qs-browser {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(8px) scale(0.98);
+  transition: opacity 320ms ease, transform 320ms ease;
+}
+
+.qs-browser-open {
+  opacity: 1;
+  transform: none;
+}
+
+.qs-browser-bar {
+  align-items: center;
+  background: #fbfbfb;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+}
+
+.qs-browser-url {
+  color: var(--muted);
+  flex: 1 1 auto;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  text-align: center;
+}
+
+.qs-browser .kp-board {
+  padding: 14px;
 }
 
 /* Format ----------------------------------------------------------------- */
@@ -569,10 +769,20 @@ section {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  color: var(--ink);
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 13px;
   line-height: 1.65;
+  min-height: 320px;
+  outline: none;
   padding: 22px 24px;
-  white-space: pre;
+  resize: vertical;
+  width: 100%;
+}
+
+.format-pre:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .format-arrow {
