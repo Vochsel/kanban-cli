@@ -1,6 +1,6 @@
 {
   "name": "kanban-cli",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A tiny Bun-powered markdown kanban board CLI.",
   "type": "module",
   "preferGlobal": true,
