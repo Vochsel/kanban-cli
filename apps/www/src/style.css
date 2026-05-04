@@ -741,6 +741,73 @@ section {
   padding: 14px;
 }
 
+.qs-pair {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+
+.qs-file {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(8px) scale(0.98);
+  transition: opacity 320ms ease 80ms, transform 320ms ease 80ms;
+}
+
+.qs-file-open {
+  opacity: 1;
+  transform: none;
+}
+
+.qs-file-bar {
+  align-items: center;
+  background: #fbfbfb;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  display: flex;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.qs-file-icon {
+  color: var(--muted);
+  display: inline-flex;
+}
+
+.qs-file-name {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.qs-file-status {
+  color: var(--green);
+  font-size: 11px;
+  margin-left: auto;
+  transition: color 120ms ease;
+}
+
+.qs-file-status-writing {
+  color: var(--accent);
+}
+
+.qs-file-body {
+  color: var(--ink);
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+  margin: 0;
+  max-height: 320px;
+  overflow: auto;
+  padding: 16px 18px;
+  white-space: pre-wrap;
+}
+
 /* Format ----------------------------------------------------------------- */
 
 .format-grid {

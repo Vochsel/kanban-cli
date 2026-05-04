@@ -364,14 +364,7 @@ function mountBoard(selector: string, board: Board, options: BoardOptions = {}):
 
 // ---- format section: bidirectional sync ---------------------------------
 
-const formatSeedMarkdown = `When working through tasks here:
-
-- Move a task into "Doing"
-  before starting work on it
-- When done, move it to the
-  top of "Done"
-
-# Todo
+const formatSeedMarkdown = `# Todo
 - [ ] Add CLI: serve a local board
 - [ ] Polish UI: feel good
 
@@ -443,10 +436,14 @@ function setupQuickstart(): void {
   const body = document.querySelector<HTMLElement>("[data-qs-body]");
   const input = document.querySelector<HTMLInputElement>("[data-qs-input]");
   const browser = document.querySelector<HTMLElement>("[data-qs-browser]");
+  const file = document.querySelector<HTMLElement>("[data-qs-file]");
+  const fileBody = document.querySelector<HTMLElement>("[data-qs-file-body]");
+  const fileStatus = document.querySelector<HTMLElement>("[data-qs-file-status]");
   const boardMount = document.querySelector<HTMLElement>('[data-board="quickstart"]');
-  if (!stage || !body || !input || !browser || !boardMount) return;
+  if (!stage || !body || !input || !browser || !file || !fileBody || !boardMount) return;
 
   let started = false;
+  let savedTimer: number | undefined;
 
   const run = () => {
     if (started) return;
@@ -474,7 +471,7 @@ function setupQuickstart(): void {
     let cursor = 0;
     const writeNext = () => {
       if (cursor >= lines.length) {
-        showBrowser();
+        showLiveView();
         return;
       }
       const { text, delay } = lines[cursor]!;
@@ -488,14 +485,34 @@ function setupQuickstart(): void {
     setTimeout(writeNext, 180);
   };
 
-  const showBrowser = () => {
+  const flashSaved = () => {
+    if (!fileStatus) return;
+    fileStatus.textContent = "writing…";
+    fileStatus.classList.add("qs-file-status-writing");
+    if (savedTimer) clearTimeout(savedTimer);
+    savedTimer = window.setTimeout(() => {
+      fileStatus.textContent = "saved";
+      fileStatus.classList.remove("qs-file-status-writing");
+    }, 360);
+  };
+
+  const showLiveView = () => {
     browser.hidden = false;
-    requestAnimationFrame(() => browser.classList.add("qs-browser-open"));
+    file.hidden = false;
+    requestAnimationFrame(() => {
+      browser.classList.add("qs-browser-open");
+      file.classList.add("qs-file-open");
+    });
     const ctrl = new BoardController(boardMount, quickstartSeed, {
-      showAddCard: false,
+      showAddCard: true,
       editable: true,
     });
+    ctrl.onChange = (b) => {
+      fileBody.textContent = serializeMarkdown(b);
+      flashSaved();
+    };
     ctrl.render();
+    fileBody.textContent = serializeMarkdown(quickstartSeed);
     stage.classList.add("qs-stage-open");
   };
 

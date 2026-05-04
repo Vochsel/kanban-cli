@@ -126,7 +126,7 @@
         <div class="qs-grid">
           <div>
             <h2 class="section-title">Quick start.</h2>
-            <p class="section-lede">One command, no install. If <code>board.md</code> doesn't exist yet, kanban-cli creates a starter board with a default instructions block at the top.</p>
+            <p class="section-lede">One command, no install. The browser opens, the file appears next to it, and every change you make in the board writes back to <code>board.md</code> in real time.</p>
             <div class="qs-cta">
               <a class="btn btn-primary" href="https://github.com/Vochsel/kanban-cli#install" target="_blank" rel="noopener">Read the install guide</a>
             </div>
@@ -156,14 +156,26 @@
                 </div>
               </div>
             </div>
-            <div class="qs-browser" data-qs-browser hidden>
-              <div class="qs-browser-bar">
-                <span class="kp-dot kp-dot-r"></span>
-                <span class="kp-dot kp-dot-y"></span>
-                <span class="kp-dot kp-dot-g"></span>
-                <span class="qs-browser-url">http://127.0.0.1:4177</span>
+            <div class="qs-pair">
+              <div class="qs-browser" data-qs-browser hidden>
+                <div class="qs-browser-bar">
+                  <span class="kp-dot kp-dot-r"></span>
+                  <span class="kp-dot kp-dot-y"></span>
+                  <span class="kp-dot kp-dot-g"></span>
+                  <span class="qs-browser-url">http://127.0.0.1:4177</span>
+                </div>
+                <div class="kp-board kp-board-mini" data-board="quickstart"></div>
               </div>
-              <div class="kp-board kp-board-mini" data-board="quickstart"></div>
+              <div class="qs-file" data-qs-file hidden>
+                <div class="qs-file-bar">
+                  <span class="qs-file-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  </span>
+                  <span class="qs-file-name">board.md</span>
+                  <span class="qs-file-status" data-qs-file-status>saved</span>
+                </div>
+                <pre class="qs-file-body" data-qs-file-body></pre>
+              </div>
             </div>
           </div>
         </div>
