@@ -1635,6 +1635,7 @@ export function renderAppShell(options: AppShellOptions): string {
   <script>
     const state = {
       board: { columns: [] },
+      baseBoard: { columns: [] },
       fileName: ${JSON.stringify(options.fileName)},
       filePath: ${JSON.stringify(options.filePath)},
       fileVersion: null,
@@ -2035,6 +2036,7 @@ export function renderAppShell(options: AppShellOptions): string {
         if (!response.ok) throw new Error(await response.text());
         const payload = await response.json();
         state.board = payload.board;
+        state.baseBoard = JSON.parse(JSON.stringify(payload.board));
         state.fileVersion = payload.version;
         state.fileName = payload.fileName;
         state.isDirty = false;
@@ -2049,7 +2051,8 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     async function checkDiskChanges() {
-      if (!state.fileVersion || state.isDirty || state.isSaving || state.dragType) {
+      // We can't safely merge mid-drag or while a save is in flight.
+      if (!state.fileVersion || state.isSaving || state.dragType) {
         return;
       }
 
@@ -2058,8 +2061,24 @@ export function renderAppShell(options: AppShellOptions): string {
         if (!response.ok) throw new Error(await response.text());
         const payload = await response.json();
 
-        if (payload.version && payload.version !== state.fileVersion) {
+        if (!payload.version || payload.version === state.fileVersion) return;
+
+        if (state.isDirty) {
+          // Disk diverged while we have unsaved local edits — three-way merge.
+          syncStateFromDom();
+          const merged = mergeBoards(state.baseBoard, state.board, payload.board);
+          state.board = merged;
+          state.baseBoard = JSON.parse(JSON.stringify(payload.board));
+          state.fileVersion = payload.version;
+          state.fileName = payload.fileName;
+          applyBoardChrome();
+          renderBoard();
+          setStatus("Merged disk changes", "saved");
+          // Push the merged result back so disk and ui converge.
+          scheduleSave();
+        } else {
           state.board = payload.board;
+          state.baseBoard = JSON.parse(JSON.stringify(payload.board));
           state.fileVersion = payload.version;
           state.fileName = payload.fileName;
           applyBoardChrome();
@@ -2070,6 +2089,103 @@ export function renderAppShell(options: AppShellOptions): string {
         console.error(error);
         setStatus("Sync failed", "error");
       }
+    }
+
+    function mergeBoards(base, client, disk) {
+      // Card-level three-way merge.
+      // - Per-field: client-wins if client diverged from base.
+      // - Cards: additions on either side kept; deletions on either side respected.
+      // - Column moves: client choice respected when it diverged from base.
+      // - Board-level fields (title, theme, instructions): client-wins if changed vs base.
+      base = base || { columns: [] };
+      client = client || { columns: [] };
+      disk = disk || { columns: [] };
+
+      function indexCards(board) {
+        const m = new Map();
+        for (const col of board.columns || []) {
+          for (let i = 0; i < (col.cards || []).length; i += 1) {
+            const card = col.cards[i];
+            if (card && card.id) m.set(card.id, { card: card, columnId: col.id, index: i });
+          }
+        }
+        return m;
+      }
+
+      const baseCards = indexCards(base);
+      const clientCards = indexCards(client);
+      const diskCards = indexCards(disk);
+
+      // Start the merge from disk shape (column order, columns).
+      const merged = JSON.parse(JSON.stringify(disk));
+      const mergedColMap = new Map(merged.columns.map((c) => [c.id, c]));
+
+      // 1. Apply client per-card changes.
+      clientCards.forEach((entry, cardId) => {
+        const baseEntry = baseCards.get(cardId);
+        const diskEntry = diskCards.get(cardId);
+
+        if (!baseEntry && !diskEntry) {
+          // Brand new card on the client — add it to the chosen column (or first as fallback).
+          const target = mergedColMap.get(entry.columnId) || merged.columns[0];
+          if (target) target.cards.push(JSON.parse(JSON.stringify(entry.card)));
+          return;
+        }
+
+        if (!diskEntry) {
+          // Disk deleted the card. Respect that deletion — don't re-add.
+          return;
+        }
+
+        // Card exists on disk: locate it in merged and reconcile fields.
+        let mergedCol = null;
+        let mergedIdx = -1;
+        for (const col of merged.columns) {
+          const idx = col.cards.findIndex((c) => c.id === cardId);
+          if (idx !== -1) { mergedCol = col; mergedIdx = idx; break; }
+        }
+        if (!mergedCol) return;
+        const mergedCard = mergedCol.cards[mergedIdx];
+        const baseCard = baseEntry ? baseEntry.card : null;
+
+        for (const field of ["title", "description", "done", "icon"]) {
+          const clientVal = entry.card[field];
+          const baseVal = baseCard ? baseCard[field] : undefined;
+          const clientDiverged = baseCard ? clientVal !== baseVal : clientVal !== mergedCard[field];
+          if (clientDiverged) {
+            mergedCard[field] = clientVal;
+          }
+        }
+
+        // Column move: if client moved this card to a different column than base, honor that.
+        if (baseEntry && entry.columnId !== baseEntry.columnId && entry.columnId !== mergedCol.id) {
+          const targetCol = mergedColMap.get(entry.columnId);
+          if (targetCol) {
+            mergedCol.cards.splice(mergedIdx, 1);
+            targetCol.cards.push(mergedCard);
+          }
+        }
+      });
+
+      // 2. Honor client-side deletions: cards in base that are gone from client should be removed from merged.
+      baseCards.forEach((baseEntry, cardId) => {
+        if (!clientCards.has(cardId) && diskCards.has(cardId)) {
+          for (const col of merged.columns) {
+            const idx = col.cards.findIndex((c) => c.id === cardId);
+            if (idx !== -1) { col.cards.splice(idx, 1); break; }
+          }
+        }
+      });
+
+      // 3. Board-level scalars: client wins where it diverged from base.
+      const baseTitle = base.title;
+      const baseInstructions = base.instructions;
+      const baseTheme = base.theme;
+      if (client.title !== baseTitle) merged.title = client.title;
+      if (client.instructions !== baseInstructions) merged.instructions = client.instructions;
+      if (client.theme !== baseTheme) merged.theme = client.theme;
+
+      return merged;
     }
 
     function applyBoardChrome() {
@@ -2826,6 +2942,7 @@ export function renderAppShell(options: AppShellOptions): string {
 
         if (token === state.saveToken) {
           state.board = payload.board;
+          state.baseBoard = JSON.parse(JSON.stringify(payload.board));
           state.fileVersion = payload.version;
           state.fileName = payload.fileName;
           state.isDirty = false;

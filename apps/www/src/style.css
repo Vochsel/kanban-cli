@@ -206,6 +206,31 @@ footer {
   color: var(--green);
 }
 
+.btn-icon {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.btn-icon svg {
+  flex: 0 0 auto;
+}
+
+.npm-mark {
+  background: #cb3837;
+  border-radius: 3px;
+  color: #fff;
+  display: inline-flex;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  height: 16px;
+  letter-spacing: 0.04em;
+  padding: 0 4px;
+  align-items: center;
+  text-transform: lowercase;
+}
+
 /* Hero ------------------------------------------------------------------- */
 
 main {

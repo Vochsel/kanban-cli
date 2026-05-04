@@ -15,11 +15,12 @@ When working through tasks here, always follow these defaults and check after st
 - [ ] since we run from cli, we could have auto-implement: run claude -p or codex from cli to auto start, or tidy cards etc
 
 # Todo
-- [ ] Improve the parallelism so that in progress changes from ui are merged neatly and nicely with any updates on disk from ai.: Do this auto merge and line by line
 
 # Doing
 
 # Done
+- [x] move github to be next to npm button, and icons for both
+- [x] Improve the parallelism so that in progress changes from ui are merged neatly and nicely with any updates on disk from ai.: Do this auto merge and line by line
 - [x] Create a one click copy of prompt to install and run kanban-cli: prompt is like create or find todo markdown file, and then run npx start of kanban-cli@latest
 - [x] Add support for space separated files to open multiple boards: show these in ui as selectable dropdown in top left on name of current board
 - [x] add full darkmode support with toggle and override
