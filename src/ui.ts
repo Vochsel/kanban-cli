@@ -306,11 +306,26 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .brand-mark {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      align-items: center;
+      border-radius: 6px;
+      color: var(--ink);
+      display: inline-flex;
       flex: 0 0 auto;
+      height: 24px;
+      justify-content: center;
+      transition: opacity 120ms ease, transform 120ms ease;
+      width: 24px;
+    }
+
+    .brand-mark:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+
+    .brand-mark svg {
+      display: block;
+      height: 22px;
+      width: 22px;
     }
 
     .board-switcher {
@@ -1502,7 +1517,14 @@ export function renderAppShell(options: AppShellOptions): string {
   <div class="shell">
     <header class="topbar">
       <div class="brand">
-        <span class="brand-mark">kanban-cli</span>
+        <a class="brand-mark" href="https://kanban-cli.vochsel.com" target="_blank" rel="noopener noreferrer" aria-label="kanban-cli — open kanban-cli.vochsel.com" title="kanban-cli">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect width="24" height="24" rx="5" fill="currentColor"/>
+            <rect x="5" y="6" width="3" height="9" rx="1.2" fill="var(--surface)"/>
+            <rect x="10.5" y="6" width="3" height="6" rx="1.2" fill="var(--surface)"/>
+            <rect x="16" y="6" width="3" height="12" rx="1.2" fill="var(--surface)"/>
+          </svg>
+        </a>
         ${
           (options.boards ?? []).length > 1
             ? `<select id="boardSwitcher" class="board-switcher" aria-label="Switch board">

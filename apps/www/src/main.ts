@@ -550,6 +550,146 @@ mountBoard('[data-board="hero"]', structuredClone(heroSeed), {
 setupFormatSection();
 setupQuickstart();
 setupCopyAiPrompt();
+setupChangelog();
+
+interface GithubRelease {
+  tag_name: string;
+  name: string | null;
+  published_at: string | null;
+  body: string | null;
+  html_url: string;
+  prerelease: boolean;
+}
+
+function setupChangelog(): void {
+  const mount = document.querySelector<HTMLElement>("[data-changelog]");
+  const status = document.querySelector<HTMLElement>("[data-changelog-status]");
+  if (!mount) return;
+
+  const url = "https://api.github.com/repos/Vochsel/kanban-cli/releases?per_page=20";
+
+  fetch(url, { headers: { Accept: "application/vnd.github+json" } })
+    .then((res) => {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json() as Promise<GithubRelease[]>;
+    })
+    .then((releases) => {
+      if (!Array.isArray(releases) || releases.length === 0) {
+        if (status) status.textContent = "No releases yet.";
+        return;
+      }
+      mount.innerHTML = "";
+      for (const release of releases) {
+        mount.appendChild(renderReleaseColumn(release));
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      if (status) status.textContent = "Couldn't load releases. View them on GitHub.";
+    });
+}
+
+function renderReleaseColumn(release: GithubRelease): HTMLElement {
+  const col = document.createElement("div");
+  col.className = "kp-col changelog-col";
+
+  const head = document.createElement("a");
+  head.className = "kp-col-head changelog-col-head";
+  head.href = release.html_url;
+  head.target = "_blank";
+  head.rel = "noopener noreferrer";
+
+  const tag = document.createElement("span");
+  tag.className = "changelog-tag";
+  tag.textContent = release.tag_name;
+  head.appendChild(tag);
+
+  const date = document.createElement("span");
+  date.className = "changelog-date";
+  date.textContent = formatReleaseDate(release.published_at);
+  head.appendChild(date);
+
+  col.appendChild(head);
+
+  const items = parseReleaseBody(release.body ?? "");
+  if (items.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "kp-card changelog-empty";
+    empty.textContent = release.name ?? release.tag_name;
+    col.appendChild(empty);
+    return col;
+  }
+
+  for (const item of items) {
+    const card = document.createElement("div");
+    card.className = "kp-card changelog-card";
+    if (item.heading) {
+      const heading = document.createElement("div");
+      heading.className = "changelog-card-heading";
+      heading.textContent = item.heading;
+      card.appendChild(heading);
+    }
+    const body = document.createElement("div");
+    body.className = "changelog-card-body";
+    body.textContent = item.text;
+    card.appendChild(body);
+    col.appendChild(card);
+  }
+
+  return col;
+}
+
+function parseReleaseBody(body: string): { heading?: string; text: string }[] {
+  const lines = body.replace(/\r\n?/g, "\n").split("\n");
+  const items: { heading?: string; text: string }[] = [];
+  let currentHeading: string | undefined;
+  let buffer: string[] = [];
+
+  const flushBuffer = () => {
+    if (buffer.length === 0) return;
+    const text = buffer.join(" ").replace(/\s+/g, " ").trim();
+    if (text) items.push({ heading: currentHeading, text });
+    buffer = [];
+  };
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) {
+      flushBuffer();
+      continue;
+    }
+    const headingMatch = line.match(/^#{1,6}\s+(.+)$/);
+    if (headingMatch) {
+      flushBuffer();
+      currentHeading = stripMarkdown(headingMatch[1] ?? "");
+      continue;
+    }
+    const bulletMatch = line.match(/^[-*]\s+(.+)$/);
+    if (bulletMatch) {
+      flushBuffer();
+      buffer.push(stripMarkdown(bulletMatch[1] ?? ""));
+      continue;
+    }
+    buffer.push(stripMarkdown(line));
+  }
+  flushBuffer();
+  return items;
+}
+
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+}
+
+function formatReleaseDate(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
 
 function setupCopyAiPrompt(): void {
   const btn = document.querySelector<HTMLButtonElement>("[data-copy-ai-prompt]");

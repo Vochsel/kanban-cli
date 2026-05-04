@@ -15,12 +15,13 @@ When working through tasks here, always follow these defaults and check after st
 - [ ] since we run from cli, we could have auto-implement: run claude -p or codex from cli to auto start, or tidy cards etc
 
 # Todo
-- [ ] add a changelog to the www page, and update dynamically based on git history, but human readable: stylize visually as its own kanban board, but columns per date released
-- [ ] change kanban-cli text on localhost kanban page to the favicon svg we created, and on click go to kanban-cli.vochsel.com
+- [ ] Make version v0.
 
 # Doing <!-- icon: play -->
 
 # Done <!-- icon: double-tick -->
+- [x] add a changelog to the www page, and update dynamically based on git history, but human readable: stylize visually as its own kanban board, but columns per date released
+- [x] change kanban-cli text on localhost kanban page to the favicon svg we created, and on click go to kanban-cli.vochsel.com
 - [x] improve the settings dialog, the sidebar items should not be staggered, and make sure all tab item content is nicely laid out
 - [x] the color scheme of the board is not working anymore
 - [x] in terminal output when running, add a version output
