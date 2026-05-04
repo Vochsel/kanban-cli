@@ -1,33 +1,33 @@
-# kanban-md
+# kanban-cli
 
-[![npm version](https://img.shields.io/npm/v/kanban-md.svg)](https://www.npmjs.com/package/kanban-md)
+[![npm version](https://img.shields.io/npm/v/kanban-cli.svg)](https://www.npmjs.com/package/kanban-cli)
 
-`kanban-md` is a tiny Bun-powered CLI that turns a markdown file into a local Trello-style kanban board.
+`kanban-cli` is a tiny Bun-powered CLI that turns a markdown file into a local Trello-style kanban board.
 
 ```sh
-npx kanban-md@latest board.md
+npx kanban-cli@latest board.md
 ```
 
-The browser UI runs on localhost, supports drag and drop across columns, writes every edit back to the markdown file, and reloads when the file changes on disk. If the markdown file does not exist, kanban-md creates a starter board and opens it.
+The browser UI runs on localhost, supports drag and drop across columns, writes every edit back to the markdown file, and reloads when the file changes on disk. If the markdown file does not exist, kanban-cli creates a starter board and opens it.
 
 ## Run it
 
 The fastest path is no install at all:
 
 ```sh
-npx kanban-md@latest board.md
+npx kanban-cli@latest board.md
 ```
 
 If you use Bun:
 
 ```sh
-bunx kanban-md@latest board.md
+bunx kanban-cli@latest board.md
 ```
 
 If you'd rather have it on your PATH as `kb`, install globally:
 
 ```sh
-npm install -g kanban-md
+npm install -g kanban-cli
 kb board.md
 ```
 
@@ -57,7 +57,7 @@ Headings become columns. Checkbox list items become cards. The first colon separ
 - [x] Create markdown board: headings become columns
 ```
 
-`kanban-md` writes a canonical markdown format so changes are easy to review in git.
+`kanban-cli` writes a canonical markdown format so changes are easy to review in git.
 
 ## CLI
 
@@ -74,7 +74,7 @@ Options:
 - `-v, --version`: print the package version.
 - `-h, --help`: show help.
 
-If the markdown file does not exist, `kanban-md` creates a starter board.
+If the markdown file does not exist, `kanban-cli` creates a starter board.
 
 ## Development
 

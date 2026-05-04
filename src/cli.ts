@@ -25,7 +25,7 @@ async function main(args: string[] = Bun.argv.slice(2)): Promise<void> {
 
   const running = await startWithPortFallback(options);
 
-  console.log(`kanban-md is running
+  console.log(`kanban-cli is running
 File: ${running.filePath}
 Board: ${running.url}
 Press Ctrl-C to stop.`);
@@ -108,7 +108,7 @@ async function startWithPortFallback(options: CliOptions): Promise<RunningServer
     }
   }
 
-  throw lastError instanceof Error ? lastError : new Error("Could not start kanban-md");
+  throw lastError instanceof Error ? lastError : new Error("Could not start kanban-cli");
 }
 
 async function openBrowser(url: string): Promise<void> {
@@ -142,7 +142,7 @@ async function packageVersion(): Promise<string> {
 }
 
 function printHelp(): void {
-  console.log(`kanban-md
+  console.log(`kanban-cli
 
 Usage:
   kb <board.md> [options]

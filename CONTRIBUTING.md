@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for improving `kanban-md`.
+Thanks for improving `kanban-cli`.
 
 ## Development
 

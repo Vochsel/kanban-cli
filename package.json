@@ -1,6 +1,6 @@
 {
-  "name": "kanban-md",
-  "version": "0.2.0",
+  "name": "kanban-cli",
+  "version": "0.2.1",
   "description": "A tiny Bun-powered markdown kanban board CLI.",
   "type": "module",
   "preferGlobal": true,
@@ -30,12 +30,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Vochsel/kanban-md.git"
+    "url": "git+https://github.com/Vochsel/kanban-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/Vochsel/kanban-md/issues"
+    "url": "https://github.com/Vochsel/kanban-cli/issues"
   },
-  "homepage": "https://github.com/Vochsel/kanban-md#readme",
+  "homepage": "https://github.com/Vochsel/kanban-cli#readme",
   "publishConfig": {
     "access": "public"
   },

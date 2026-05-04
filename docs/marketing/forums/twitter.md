@@ -7,13 +7,13 @@ Three short threads, each tuned for a different audience. Each lead post is ≤ 
 ## Variant A — terminal/Bun crowd ("ship a tiny tool")
 
 **Lead:**
-> launched kanban-md
+> launched kanban-cli
 >
 > a markdown file → drag-and-drop kanban board on localhost. one Bun CLI, zero DB.
 >
 > `kb board.md` and you're in.
 >
-> github.com/Vochsel/kanban-md
+> github.com/Vochsel/kanban-cli
 
 **Reply 1:**
 > headings are columns. `- [ ] thing: description` lines are cards. drop a card in another column, the file updates in milliseconds. edit the file in vim, the board reloads.
@@ -30,7 +30,7 @@ Three short threads, each tuned for a different audience. Each lead post is ≤ 
 >
 > no database. no sync server. no separate app to keep in sync with your notes. drag cards in the browser, the file on disk updates. edit the file in your editor, the board reloads.
 >
-> github.com/Vochsel/kanban-md
+> github.com/Vochsel/kanban-cli
 
 **Reply 1:**
 > the round-trip is the whole point. writer emits canonical, diff-friendly markdown. parser preserves multi-line descriptions. you can review board changes in a git PR without squinting.
@@ -45,9 +45,9 @@ Three short threads, each tuned for a different audience. Each lead post is ≤ 
 **Lead:**
 > tired of pasting "do the next thing" into Claude/Cursor.
 >
-> built kanban-md: your todo list is a markdown kanban board. the board has a "copy prompt" button that hands the agent the file path + your custom instructions, then you watch it tick items off live.
+> built kanban-cli: your todo list is a markdown kanban board. the board has a "copy prompt" button that hands the agent the file path + your custom instructions, then you watch it tick items off live.
 >
-> github.com/Vochsel/kanban-md
+> github.com/Vochsel/kanban-cli
 
 **Reply 1:**
 > the file IS the source of truth. agents read and write the same markdown you do. drag a card while it's working, no conflicts — the browser merges with what's on disk.

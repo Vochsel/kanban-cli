@@ -156,7 +156,7 @@ export function renderAppShell(options: AppShellOptions): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escapeHtml(options.fileName)} - kanban-md</title>
+  <title>${escapeHtml(options.fileName)} - kanban-cli</title>
   <style>
     :root {
       color-scheme: light;
@@ -1114,7 +1114,7 @@ export function renderAppShell(options: AppShellOptions): string {
   <div class="shell">
     <header class="topbar">
       <div class="brand">
-        <span class="brand-mark">kanban-md</span>
+        <span class="brand-mark">kanban-cli</span>
         <input id="boardTitle" class="board-title" type="text" aria-label="Board title" autocomplete="off" spellcheck="false">
       </div>
       <button id="copyPromptBtn" class="ghost copy-prompt-btn" type="button" title="Copy a prompt to start implementing the Todo column">
@@ -1520,7 +1520,7 @@ export function renderAppShell(options: AppShellOptions): string {
 
     function updateDocumentTitle() {
       const display = (state.board.title && state.board.title.trim()) || state.fileName;
-      document.title = display + " - kanban-md";
+      document.title = display + " - kanban-cli";
     }
 
     function applyTheme(color) {

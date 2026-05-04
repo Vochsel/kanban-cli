@@ -1,9 +1,9 @@
 {
-  "name": "kanban-md-www",
+  "name": "kanban-cli-www",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "Marketing/explainer site for kanban-md.",
+  "description": "Marketing/explainer site for kanban-cli.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

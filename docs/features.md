@@ -1,6 +1,6 @@
 ---
 title: Features for Kanban
-theme: #4bce97
+theme: #0747a6
 ---
 
 When working through tasks here, always follow these defaults and check after starting or finishing a task:
@@ -13,6 +13,8 @@ When working through tasks here, always follow these defaults and check after st
 - [ ] Improve the parallelism so that in progress changes from ui are merged neatly and nicely with any updates on disk from ai.: Do this auto merge and line by line
 
 # Todo
+- [ ] Add support for space separated files to open multiple boards: show these in ui as selectable dropdown in top left on name of current board
+- [ ] add full darkmode support with toggle and override
 
 # Doing
 
