@@ -270,6 +270,12 @@ main {
   justify-content: center;
 }
 
+.hero-sub {
+  color: var(--muted-soft);
+  font-size: 13px;
+  margin: 14px 0 0;
+}
+
 /* Hero preview window --------------------------------------------------- */
 
 .hero-preview {

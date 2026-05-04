@@ -5,36 +5,41 @@
 `kanban-md` is a tiny Bun-powered CLI that turns a markdown file into a local Trello-style kanban board.
 
 ```sh
-kb test.md
+npx kanban-md@latest board.md
 ```
 
-The browser UI runs on localhost, supports drag and drop across columns, writes every edit back to the markdown file, and reloads when the file changes on disk.
+The browser UI runs on localhost, supports drag and drop across columns, writes every edit back to the markdown file, and reloads when the file changes on disk. If the markdown file does not exist, kanban-md creates a starter board and opens it.
 
-## Install
+## Run it
 
-Requires Bun 1.3 or newer.
+The fastest path is no install at all:
 
-Install globally from npm:
+```sh
+npx kanban-md@latest board.md
+```
+
+If you use Bun:
+
+```sh
+bunx kanban-md@latest board.md
+```
+
+If you'd rather have it on your PATH as `kb`, install globally:
 
 ```sh
 npm install -g kanban-md
-```
-
-That adds the `kb` command to your shell:
-
-```sh
 kb board.md
 ```
 
-If the markdown file does not exist, `kb` creates a starter board and opens the local kanban UI.
-
-You can also run from a checkout without installing globally:
+Or run straight from a checkout (handy for hacking on the CLI itself):
 
 ```sh
 bun install
-bun run build
-bun run ./src/cli.ts ./examples/basic.md
+bun run dev          # uses ./examples/basic.md
+bun run dev path.md  # or pass any markdown file
 ```
+
+Requires Bun 1.3 or newer at runtime (the published binary is built with Bun and `npx`/`bunx` will fetch it on demand).
 
 ## Markdown format
 

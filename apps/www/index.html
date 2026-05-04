@@ -41,7 +41,7 @@
         </p>
         <div class="cta">
           <a class="btn btn-primary btn-lg" href="https://www.npmjs.com/package/kanban-md" target="_blank" rel="noopener">
-            <span class="cta-prefix">$</span> npm i -g kanban-md
+            <span class="cta-prefix">$</span> npx kanban-md@latest board.md
           </a>
           <a class="btn btn-ghost btn-lg" href="https://github.com/Vochsel/kanban-md" target="_blank" rel="noopener">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -50,6 +50,7 @@
             Star on GitHub
           </a>
         </div>
+        <p class="hero-sub">No install required — runs directly from npm.</p>
 
         <div class="hero-preview" aria-hidden="true">
           <div class="kp-window">
@@ -151,7 +152,7 @@
         <div class="qs-grid">
           <div>
             <h2 class="section-title">Quick start.</h2>
-            <p class="section-lede">Two commands. If <code>board.md</code> doesn't exist yet, kanban-md creates a starter board with a default instructions block at the top.</p>
+            <p class="section-lede">One command, no install. If <code>board.md</code> doesn't exist yet, kanban-md creates a starter board with a default instructions block at the top.</p>
             <div class="qs-cta">
               <a class="btn btn-primary" href="https://github.com/Vochsel/kanban-md#install" target="_blank" rel="noopener">Read the install guide</a>
             </div>
@@ -162,11 +163,18 @@
               <span class="kp-dot kp-dot-y"></span>
               <span class="kp-dot kp-dot-g"></span>
             </div>
-            <pre><code><span class="qs-prompt">$</span> npm install -g kanban-md
-<span class="qs-prompt">$</span> kb board.md
+            <pre><code><span class="qs-comment"># run instantly</span>
+<span class="qs-prompt">$</span> npx kanban-md@latest board.md
 <span class="qs-comment">▸ kanban-md is running</span>
 <span class="qs-comment">▸ File:  /Users/you/board.md</span>
-<span class="qs-comment">▸ Board: http://127.0.0.1:4177</span></code></pre>
+<span class="qs-comment">▸ Board: http://127.0.0.1:4177</span>
+
+<span class="qs-comment"># or with bun</span>
+<span class="qs-prompt">$</span> bunx kanban-md@latest board.md
+
+<span class="qs-comment"># or install globally as `kb`</span>
+<span class="qs-prompt">$</span> npm i -g kanban-md
+<span class="qs-prompt">$</span> kb board.md</code></pre>
           </div>
         </div>
       </section>
