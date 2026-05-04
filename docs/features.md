@@ -15,12 +15,13 @@ When working through tasks here, always follow these defaults and check after st
 - [ ] since we run from cli, we could have auto-implement: run claude -p or codex from cli to auto start, or tidy cards etc
 
 # Todo
-- [ ] Add support for space separated files to open multiple boards: show these in ui as selectable dropdown in top left on name of current board
 - [ ] Improve the parallelism so that in progress changes from ui are merged neatly and nicely with any updates on disk from ai.: Do this auto merge and line by line
+- [ ] Create a one click copy of prompt to install and run kanban-cli: prompt is like create or find todo markdown file, and then run npx start of kanban-cli@latest
 
 # Doing
 
 # Done
+- [x] Add support for space separated files to open multiple boards: show these in ui as selectable dropdown in top left on name of current board
 - [x] add full darkmode support with toggle and override
 - [x] add a opt-in feature that plays a sound in browser when cards move to doing, and then done: simple subtle sfx, done should be like a check success sound
 - [x] add r.click context menu to all cards, and add copy deeplink off card into there: also add delete, copy text to clipboard, and edit description options to context menu

@@ -8,7 +8,7 @@ const DEFAULT_PORT = 4177;
 const FALLBACK_PORT_ATTEMPTS = 10;
 
 interface CliOptions {
-  filePath: string;
+  filePaths: string[];
   host: string;
   port: number;
   open: boolean;
@@ -25,8 +25,9 @@ async function main(args: string[] = Bun.argv.slice(2)): Promise<void> {
 
   const running = await startWithPortFallback(options);
 
+  const fileLines = running.filePaths.map((p, i) => `  ${i === 0 ? "›" : " "} ${p}`).join("\n");
   console.log(`kanban-cli is running
-File: ${running.filePath}
+${running.filePaths.length > 1 ? `Boards (${running.filePaths.length}):\n${fileLines}` : `File: ${running.filePaths[0]}`}
 Board: ${running.url}
 Press Ctrl-C to stop.`);
 
@@ -67,9 +68,9 @@ async function parseCli(args: string[]): Promise<CliOptions | undefined> {
     return undefined;
   }
 
-  const [filePath] = parsed.positionals;
+  const filePaths = parsed.positionals;
 
-  if (!filePath) {
+  if (filePaths.length === 0) {
     printHelp();
     process.exitCode = 1;
     return undefined;
@@ -82,7 +83,7 @@ async function parseCli(args: string[]): Promise<CliOptions | undefined> {
   }
 
   return {
-    filePath: resolve(filePath),
+    filePaths: filePaths.map((p) => resolve(p)),
     host: parsed.values.host ?? DEFAULT_HOST,
     port,
     open: parsed.values["no-open"] ? false : parsed.values.open ?? true,
@@ -98,7 +99,7 @@ async function startWithPortFallback(options: CliOptions): Promise<RunningServer
   for (let index = 0; index < attempts; index += 1) {
     try {
       return await startKanbanServer({
-        filePath: options.filePath,
+        filePaths: options.filePaths,
         host: options.host,
         port: options.port + index,
         defaultInstructions: options.defaultInstructions
@@ -145,7 +146,7 @@ function printHelp(): void {
   console.log(`kanban-cli
 
 Usage:
-  kb <board.md> [options]
+  kb <board.md> [more.md ...] [options]
 
 Options:
   -p, --port <port>     Port to bind. Defaults to ${DEFAULT_PORT}.

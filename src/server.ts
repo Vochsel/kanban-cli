@@ -1,10 +1,10 @@
 import { basename, dirname, resolve } from "node:path";
 import { mkdir, stat, writeFile } from "node:fs/promises";
 import { createDefaultBoard, normalizeBoard, parseMarkdown, serializeBoard, type Board } from "./markdown";
-import { renderAppShell } from "./ui";
+import { renderAppShell, type BoardSummary } from "./ui";
 
 export interface ServerOptions {
-  filePath: string;
+  filePaths: string[];
   host: string;
   port: number;
   defaultInstructions?: boolean;
@@ -12,18 +12,44 @@ export interface ServerOptions {
 
 export interface RunningServer {
   server: Bun.Server<undefined>;
-  filePath: string;
-  fileName: string;
+  filePaths: string[];
+  fileNames: string[];
   host: string;
   port: number;
   url: string;
 }
 
-export async function startKanbanServer(options: ServerOptions): Promise<RunningServer> {
-  const filePath = resolve(options.filePath);
-  await ensureBoardFile(filePath, { defaultInstructions: options.defaultInstructions });
+interface BoardEntry {
+  id: string;
+  filePath: string;
+  fileName: string;
+}
 
-  const fileName = basename(filePath);
+export async function startKanbanServer(options: ServerOptions): Promise<RunningServer> {
+  const filePaths = options.filePaths.map((p) => resolve(p));
+
+  if (filePaths.length === 0) {
+    throw new Error("At least one board file path is required");
+  }
+
+  for (const filePath of filePaths) {
+    await ensureBoardFile(filePath, { defaultInstructions: options.defaultInstructions });
+  }
+
+  const boards: BoardEntry[] = filePaths.map((filePath, index) => ({
+    id: "b" + index,
+    filePath,
+    fileName: basename(filePath)
+  }));
+
+  const boardsById = new Map(boards.map((b) => [b.id, b]));
+
+  function resolveBoard(url: URL): BoardEntry {
+    const id = url.searchParams.get("board");
+    if (id && boardsById.has(id)) return boardsById.get(id)!;
+    return boards[0]!;
+  }
+
   const server = Bun.serve({
     hostname: options.host,
     port: options.port,
@@ -31,13 +57,19 @@ export async function startKanbanServer(options: ServerOptions): Promise<Running
       const url = new URL(request.url);
 
       try {
+        if (url.pathname === "/api/boards" && request.method === "GET") {
+          return json({ boards: boards.map((b) => ({ id: b.id, fileName: b.fileName, filePath: b.filePath })) });
+        }
+
         if (url.pathname === "/api/board" && request.method === "GET") {
-          const { board, version } = await readBoardWithVersion(filePath);
-          return json({ board, fileName, version });
+          const entry = resolveBoard(url);
+          const { board, version } = await readBoardWithVersion(entry.filePath);
+          return json({ id: entry.id, board, fileName: entry.fileName, filePath: entry.filePath, version });
         }
 
         if (url.pathname === "/api/board/raw" && request.method === "GET") {
-          const content = await Bun.file(filePath).text();
+          const entry = resolveBoard(url);
+          const content = await Bun.file(entry.filePath).text();
           return new Response(content, {
             headers: {
               "Cache-Control": "no-store",
@@ -47,17 +79,29 @@ export async function startKanbanServer(options: ServerOptions): Promise<Running
         }
 
         if (url.pathname === "/api/board" && request.method === "PUT") {
+          const entry = resolveBoard(url);
           const body = await request.json();
-          const { board, version } = await writeBoardWithVersion(filePath, body);
-          return json({ board, fileName, version });
+          const { board, version } = await writeBoardWithVersion(entry.filePath, body);
+          return json({ id: entry.id, board, fileName: entry.fileName, filePath: entry.filePath, version });
         }
 
         if (url.pathname === "/healthz" && request.method === "GET") {
-          return json({ ok: true, version: await fileVersion(filePath) });
+          const versions: Record<string, string> = {};
+          for (const b of boards) versions[b.id] = await fileVersion(b.filePath);
+          return json({ ok: true, versions });
         }
 
         if (request.method === "GET") {
-          return html(renderAppShell({ fileName, filePath }));
+          const summary: BoardSummary[] = boards.map((b) => ({ id: b.id, fileName: b.fileName, filePath: b.filePath }));
+          const initial = boards[0]!;
+          return html(
+            renderAppShell({
+              fileName: initial.fileName,
+              filePath: initial.filePath,
+              boards: summary,
+              activeBoardId: initial.id
+            })
+          );
         }
 
         return json({ error: "Not found" }, 404);
@@ -72,8 +116,8 @@ export async function startKanbanServer(options: ServerOptions): Promise<Running
 
   return {
     server,
-    filePath,
-    fileName,
+    filePaths,
+    fileNames: boards.map((b) => b.fileName),
     host: options.host,
     port: server.port ?? options.port,
     url: `http://${displayHost}:${server.port}`

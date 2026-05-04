@@ -62,9 +62,17 @@ import {
   Zap
 } from "lucide";
 
+export interface BoardSummary {
+  id: string;
+  fileName: string;
+  filePath: string;
+}
+
 export interface AppShellOptions {
   fileName: string;
   filePath: string;
+  boards?: BoardSummary[];
+  activeBoardId?: string;
 }
 
 type RenderableIconNode = Array<[tag: string, attrs: SVGProps, children?: RenderableIconNode]>;
@@ -303,6 +311,30 @@ export function renderAppShell(options: AppShellOptions): string {
       font-weight: 600;
       letter-spacing: 0.02em;
       flex: 0 0 auto;
+    }
+
+    .board-switcher {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      cursor: pointer;
+      flex: 0 0 auto;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      max-width: 220px;
+      padding: 4px 8px;
+      transition: border-color 120ms ease, background-color 120ms ease;
+    }
+
+    .board-switcher:hover {
+      border-color: var(--line-strong);
+    }
+
+    .board-switcher:focus-visible {
+      border-color: var(--accent);
+      outline: none;
     }
 
     .board-title {
@@ -1458,6 +1490,18 @@ export function renderAppShell(options: AppShellOptions): string {
     <header class="topbar">
       <div class="brand">
         <span class="brand-mark">kanban-cli</span>
+        ${
+          (options.boards ?? []).length > 1
+            ? `<select id="boardSwitcher" class="board-switcher" aria-label="Switch board">
+              ${(options.boards ?? [])
+                .map(
+                  (b) =>
+                    `<option value="${escapeHtml(b.id)}"${b.id === (options.activeBoardId ?? "") ? " selected" : ""}>${escapeHtml(b.fileName)}</option>`
+                )
+                .join("")}
+            </select>`
+            : ""
+        }
         <input id="boardTitle" class="board-title" type="text" aria-label="Board title" autocomplete="off" spellcheck="false">
       </div>
       <button id="copyPromptBtn" class="ghost copy-prompt-btn" type="button" title="Copy a prompt to start implementing the Todo column">
@@ -1602,8 +1646,14 @@ export function renderAppShell(options: AppShellOptions): string {
       iconPopover: null,
       themePopover: null,
       dialogCardId: null,
-      pendingDeeplink: location.hash || null
+      pendingDeeplink: location.hash || null,
+      activeBoardId: ${JSON.stringify(options.activeBoardId ?? null)},
+      boards: ${JSON.stringify(options.boards ?? [])}
     };
+
+    function boardQuery() {
+      return state.activeBoardId ? "?board=" + encodeURIComponent(state.activeBoardId) : "";
+    }
 
     const icons = ${JSON.stringify(browserIcons)};
     const columnIcons = ${JSON.stringify(columnIconMap)};
@@ -1632,6 +1682,23 @@ export function renderAppShell(options: AppShellOptions): string {
     const statusTextEl = document.querySelector("#statusText");
 
     document.querySelector("#reload").addEventListener("click", () => loadBoard("manual"));
+
+    const boardSwitcherEl = document.querySelector("#boardSwitcher");
+    if (boardSwitcherEl) {
+      boardSwitcherEl.addEventListener("change", () => {
+        const next = boardSwitcherEl.value;
+        if (!next || next === state.activeBoardId) return;
+        state.activeBoardId = next;
+        const entry = (state.boards || []).find((b) => b.id === next);
+        if (entry) {
+          state.fileName = entry.fileName;
+          state.filePath = entry.filePath;
+        }
+        state.fileVersion = null;
+        state.isDirty = false;
+        loadBoard("switch");
+      });
+    }
     document.querySelector("#copyBoardLink").addEventListener("click", (event) => {
       copyDeeplink(event.currentTarget, state.filePath, "File path copied");
     });
@@ -1964,7 +2031,7 @@ export function renderAppShell(options: AppShellOptions): string {
       setStatus("Loading", "saving");
 
       try {
-        const response = await fetch("/api/board", { headers: { "Accept": "application/json" } });
+        const response = await fetch("/api/board" + boardQuery(), { headers: { "Accept": "application/json" } });
         if (!response.ok) throw new Error(await response.text());
         const payload = await response.json();
         state.board = payload.board;
@@ -1987,7 +2054,7 @@ export function renderAppShell(options: AppShellOptions): string {
       }
 
       try {
-        const response = await fetch("/api/board", { headers: { "Accept": "application/json" } });
+        const response = await fetch("/api/board" + boardQuery(), { headers: { "Accept": "application/json" } });
         if (!response.ok) throw new Error(await response.text());
         const payload = await response.json();
 
@@ -2625,7 +2692,7 @@ export function renderAppShell(options: AppShellOptions): string {
         rawDialogEl.setAttribute("open", "");
       }
       try {
-        const response = await fetch("/api/board/raw", { headers: { "Accept": "text/markdown" } });
+        const response = await fetch("/api/board/raw" + boardQuery(), { headers: { "Accept": "text/markdown" } });
         if (!response.ok) throw new Error(await response.text());
         rawContentEl.value = await response.text();
         rawContentEl.scrollTop = 0;
@@ -2745,7 +2812,7 @@ export function renderAppShell(options: AppShellOptions): string {
       setStatus("Saving", "saving");
 
       try {
-        const response = await fetch("/api/board", {
+        const response = await fetch("/api/board" + boardQuery(), {
           method: "PUT",
           headers: {
             "Accept": "application/json",
