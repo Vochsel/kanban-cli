@@ -7,6 +7,7 @@ export interface ServerOptions {
   filePath: string;
   host: string;
   port: number;
+  defaultInstructions?: boolean;
 }
 
 export interface RunningServer {
@@ -20,7 +21,7 @@ export interface RunningServer {
 
 export async function startKanbanServer(options: ServerOptions): Promise<RunningServer> {
   const filePath = resolve(options.filePath);
-  await ensureBoardFile(filePath);
+  await ensureBoardFile(filePath, { defaultInstructions: options.defaultInstructions });
 
   const fileName = basename(filePath);
   const server = Bun.serve({
@@ -35,6 +36,16 @@ export async function startKanbanServer(options: ServerOptions): Promise<Running
           return json({ board, fileName, version });
         }
 
+        if (url.pathname === "/api/board/raw" && request.method === "GET") {
+          const content = await Bun.file(filePath).text();
+          return new Response(content, {
+            headers: {
+              "Cache-Control": "no-store",
+              "Content-Type": "text/markdown; charset=utf-8"
+            }
+          });
+        }
+
         if (url.pathname === "/api/board" && request.method === "PUT") {
           const body = await request.json();
           const { board, version } = await writeBoardWithVersion(filePath, body);
@@ -46,7 +57,7 @@ export async function startKanbanServer(options: ServerOptions): Promise<Running
         }
 
         if (request.method === "GET") {
-          return html(renderAppShell({ fileName }));
+          return html(renderAppShell({ fileName, filePath }));
         }
 
         return json({ error: "Not found" }, 404);
@@ -69,20 +80,26 @@ export async function startKanbanServer(options: ServerOptions): Promise<Running
   };
 }
 
-export async function ensureBoardFile(filePath: string): Promise<void> {
+export async function ensureBoardFile(
+  filePath: string,
+  options?: { defaultInstructions?: boolean }
+): Promise<void> {
   const file = Bun.file(filePath);
   const exists = await file.exists();
+  const seed = createDefaultBoard({
+    instructions: options?.defaultInstructions === false ? false : undefined
+  });
 
   if (!exists) {
     await mkdir(dirname(filePath), { recursive: true });
-    await writeFile(filePath, serializeBoard(createDefaultBoard()), "utf8");
+    await writeFile(filePath, serializeBoard(seed), "utf8");
     return;
   }
 
   const content = await file.text();
 
   if (content.trim().length === 0) {
-    await writeFile(filePath, serializeBoard(createDefaultBoard()), "utf8");
+    await writeFile(filePath, serializeBoard(seed), "utf8");
   }
 }
 

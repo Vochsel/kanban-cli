@@ -1,5 +1,7 @@
 # kanban-md
 
+[![npm version](https://img.shields.io/npm/v/kanban-md.svg)](https://www.npmjs.com/package/kanban-md)
+
 `kanban-md` is a tiny Bun-powered CLI that turns a markdown file into a local Trello-style kanban board.
 
 ```sh

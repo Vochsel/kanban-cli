@@ -1,6 +1,6 @@
 {
   "name": "kanban-md",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A tiny Bun-powered markdown kanban board CLI.",
   "type": "module",
   "preferGlobal": true,
@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "build": "bun build ./src/cli.ts --target=bun --outfile=dist/cli.js",
-    "dev": "bun run ./src/cli.ts ./examples/basic.md --no-open",
+    "dev": "sh -c 'bun --watch ./src/cli.ts \"${1:-./examples/basic.md}\" --no-open' --",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "prepack": "bun run build"

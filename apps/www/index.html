@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>kanban-md — markdown kanban boards in your terminal</title>
+    <meta name="description" content="A tiny Bun-powered CLI that turns a markdown file into a local Trello-style kanban board." />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <span class="brand-mark">kanban-md</span>
+      <h1>Markdown kanban boards, served from your terminal.</h1>
+      <p class="lede">
+        A tiny Bun-powered CLI that turns any markdown file into a local Trello-style kanban board —
+        drag, drop, and edit in the browser; every change writes back to the file.
+      </p>
+      <div class="cta">
+        <a class="primary" href="https://www.npmjs.com/package/kanban-md">Install from npm</a>
+        <a class="ghost" href="https://github.com/Vochsel/kanban-md">View on GitHub</a>
+      </div>
+    </header>
+
+    <section class="features">
+      <article>
+        <h3>Headings → columns</h3>
+        <p>Each <code>#</code> heading becomes a column. Each <code>- [ ]</code> checkbox becomes a card.</p>
+      </article>
+      <article>
+        <h3>Round-trips your markdown</h3>
+        <p>The browser UI writes a canonical markdown format so diffs stay reviewable in git.</p>
+      </article>
+      <article>
+        <h3>AI-friendly</h3>
+        <p>Boards seed with instructions for AI assistants. Copy a one-click prompt to start implementing the Todo column.</p>
+      </article>
+      <article>
+        <h3>Themes &amp; icons</h3>
+        <p>Pick from 16 preset palette colors and 40+ column icons. The whole board tints to match.</p>
+      </article>
+    </section>
+
+    <section class="quickstart">
+      <h2>Quick start</h2>
+      <pre><code>npm install -g kanban-md
+kb board.md</code></pre>
+      <p class="muted">Requires Bun 1.3 or newer. If <code>board.md</code> doesn't exist, kanban-md creates a starter board.</p>
+    </section>
+
+    <section class="format">
+      <h2>The markdown format</h2>
+      <pre><code># Todo
+- [ ] Add CLI: serve a local board
+- [ ] Polish UI: make the board feel good
+
+# Doing
+- [ ] Wire npm publish: add NPM_TOKEN in GitHub
+
+# Done
+- [x] Create markdown board: headings become columns
+</code></pre>
+    </section>
+
+    <footer>
+      <p>
+        Built with <a href="https://bun.com">Bun</a>.
+        Source on <a href="https://github.com/Vochsel/kanban-md">GitHub</a>.
+        Apache-2.0.
+      </p>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

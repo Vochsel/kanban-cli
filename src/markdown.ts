@@ -16,17 +16,29 @@ export interface Board {
   columns: Column[];
   title?: string;
   theme?: string;
+  instructions?: string;
 }
 
 const headingPattern = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
 const checkboxPattern = /^\s*[-*+]\s+\[( |x|X)\]\s+(.+?)\s*$/;
+const continuationPattern = /^[ \t]+(\S.*?)\s*$/;
 const frontmatterPattern = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
 const columnIconPattern = /<!--\s*icon\s*:\s*([\w-]+)\s*-->/i;
 const themePattern = /^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/;
 const iconNamePattern = /^[a-z][a-z0-9-]*$/;
 
-export function createDefaultBoard(): Board {
-  return {
+export const DEFAULT_INSTRUCTIONS = `When working through tasks here, follow these defaults:
+
+- Move a task into "Doing" section header before starting work on it
+- When you complete a task, move it to the top of the "Done" section header (sort by most recent at top of list)
+
+Once complete, check markdown to see if new todo tasks are available.`;
+
+export function createDefaultBoard(options?: { instructions?: string | false }): Board {
+  const instructions = options?.instructions === false
+    ? undefined
+    : options?.instructions ?? DEFAULT_INSTRUCTIONS;
+  const board: Board = {
     columns: [
       {
         id: "col-todo",
@@ -52,6 +64,8 @@ export function createDefaultBoard(): Board {
       }
     ]
   };
+  if (instructions) board.instructions = instructions;
+  return board;
 }
 
 export function parseMarkdown(markdown: string): Board {
@@ -61,7 +75,20 @@ export function parseMarkdown(markdown: string): Board {
   const cardIds = new Map<string, number>();
   let currentColumn: Column | undefined;
 
-  for (const line of body.split(/\r?\n/)) {
+  const allLines = body.split(/\r?\n/);
+  let firstStructureIndex = allLines.length;
+  for (let i = 0; i < allLines.length; i++) {
+    if (allLines[i].match(headingPattern) || allLines[i].match(checkboxPattern)) {
+      firstStructureIndex = i;
+      break;
+    }
+  }
+  const preludeLines = allLines.slice(0, firstStructureIndex);
+  const bodyLines = allLines.slice(firstStructureIndex);
+  const instructions = preludeLines.join("\n").replace(/^\s+|\s+$/g, "");
+
+  let currentCard: Card | undefined;
+  for (const line of bodyLines) {
     const heading = line.match(headingPattern);
 
     if (heading) {
@@ -76,38 +103,55 @@ export function parseMarkdown(markdown: string): Board {
         ...(icon ? { icon } : {})
       };
       columns.push(currentColumn);
+      currentCard = undefined;
       continue;
     }
 
     const checkbox = line.match(checkboxPattern);
 
-    if (!checkbox) {
+    if (checkbox) {
+      if (!currentColumn) {
+        currentColumn = {
+          id: uniqueId("col-inbox", columnIds),
+          title: "Inbox",
+          cards: []
+        };
+        columns.push(currentColumn);
+      }
+
+      const parsed = parseCardText(checkbox[2]);
+      const card: Card = {
+        id: uniqueId(`card-${slugify(parsed.title, "card")}`, cardIds),
+        title: parsed.title,
+        description: parsed.description,
+        done: checkbox[1].toLowerCase() === "x"
+      };
+      currentColumn.cards.push(card);
+      currentCard = card;
       continue;
     }
 
-    if (!currentColumn) {
-      currentColumn = {
-        id: uniqueId("col-inbox", columnIds),
-        title: "Inbox",
-        cards: []
-      };
-      columns.push(currentColumn);
+    if (currentCard) {
+      const cont = line.match(continuationPattern);
+      if (cont) {
+        currentCard.description = currentCard.description
+          ? currentCard.description + "\n" + cont[1]
+          : cont[1];
+        continue;
+      }
     }
 
-    const parsed = parseCardText(checkbox[2]);
-    currentColumn.cards.push({
-      id: uniqueId(`card-${slugify(parsed.title, "card")}`, cardIds),
-      title: parsed.title,
-      description: parsed.description,
-      done: checkbox[1].toLowerCase() === "x"
-    });
+    currentCard = undefined;
   }
 
-  const board: Board = columns.length > 0 ? { columns } : createDefaultBoard();
+  const board: Board = columns.length > 0
+    ? { columns }
+    : { columns: createDefaultBoard({ instructions: false }).columns };
   const title = cleanInlineText(meta.title ?? "");
   if (title) board.title = title;
   const theme = cleanTheme(meta.theme);
   if (theme) board.theme = theme;
+  if (instructions) board.instructions = instructions;
   return board;
 }
 
@@ -116,6 +160,8 @@ export function serializeBoard(board: Board): string {
   const title = cleanInlineText(board.title ?? "");
   const theme = cleanTheme(board.theme);
   const frontmatter = renderFrontmatter(title, theme);
+  const instructions = (board.instructions ?? "").replace(/^\s+|\s+$/g, "");
+  const instructionsBlock = instructions ? `${instructions}\n\n` : "";
   const body = columns
     .map((column) => {
       const columnTitle = cleanInlineText(column.title) || "Untitled";
@@ -125,17 +171,27 @@ export function serializeBoard(board: Board): string {
 
       for (const card of column.cards) {
         const cardTitle = cleanInlineText(card.title) || "Untitled";
-        const cardDescription = cleanInlineText(card.description);
+        const cardDescription = cleanMultilineText(card.description);
         const checkbox = card.done ? "x" : " ";
-        const cardBody = cardDescription ? `${cardTitle}: ${cardDescription}` : cardTitle;
-        lines.push(`- [${checkbox}] ${cardBody}`);
+        if (cardDescription.includes("\n")) {
+          const descLines = cardDescription.split("\n");
+          const first = descLines[0];
+          lines.push(first ? `- [${checkbox}] ${cardTitle}: ${first}` : `- [${checkbox}] ${cardTitle}`);
+          for (const cont of descLines.slice(1)) {
+            lines.push(`  ${cont}`);
+          }
+        } else if (cardDescription) {
+          lines.push(`- [${checkbox}] ${cardTitle}: ${cardDescription}`);
+        } else {
+          lines.push(`- [${checkbox}] ${cardTitle}`);
+        }
       }
 
       return lines.join("\n");
     })
     .join("\n\n");
 
-  return `${frontmatter}${body}\n`;
+  return `${frontmatter}${instructionsBlock}${body}\n`;
 }
 
 export function normalizeBoard(input: unknown): Board {
@@ -158,7 +214,7 @@ export function normalizeBoard(input: unknown): Board {
       return {
         id: uniqueId(cleanId(card.id, fallbackCardId), cardIds),
         title: cardTitle || "Untitled",
-        description: cleanInlineText(typeof card.description === "string" ? card.description : ""),
+        description: cleanMultilineText(typeof card.description === "string" ? card.description : ""),
         done: Boolean(card.done)
       };
     });
@@ -171,11 +227,17 @@ export function normalizeBoard(input: unknown): Board {
     };
   });
 
-  const board: Board = columns.length > 0 ? { columns } : createDefaultBoard();
+  const board: Board = columns.length > 0
+    ? { columns }
+    : { columns: createDefaultBoard({ instructions: false }).columns };
   const rawTitle = typeof source.title === "string" ? cleanInlineText(source.title) : "";
   if (rawTitle) board.title = rawTitle;
   const theme = cleanTheme(typeof source.theme === "string" ? source.theme : undefined);
   if (theme) board.theme = theme;
+  if (typeof source.instructions === "string") {
+    const instructions = source.instructions.replace(/^\s+|\s+$/g, "");
+    if (instructions) board.instructions = instructions;
+  }
   return board;
 }
 
@@ -192,7 +254,7 @@ function parseCardText(text: string): Pick<Card, "title" | "description"> {
 
   return {
     title: cleanInlineText(normalized.slice(0, separator)) || "Untitled",
-    description: cleanInlineText(normalized.slice(separator + 1))
+    description: normalized.slice(separator + 1).trim()
   };
 }
 
@@ -254,6 +316,15 @@ function cleanIconName(value: unknown): string | undefined {
 
 function cleanInlineText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
+}
+
+function cleanMultilineText(value: string): string {
+  return value
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map((line) => line.replace(/[ \t]+$/, ""))
+    .join("\n")
+    .replace(/^\s+|\s+$/g, "");
 }
 
 function cleanId(value: unknown, fallback: string): string {

@@ -13,6 +13,7 @@ interface CliOptions {
   port: number;
   open: boolean;
   strictPort: boolean;
+  defaultInstructions: boolean;
 }
 
 async function main(args: string[] = Bun.argv.slice(2)): Promise<void> {
@@ -51,7 +52,8 @@ async function parseCli(args: string[]): Promise<CliOptions | undefined> {
       open: { type: "boolean" },
       port: { type: "string", short: "p" },
       version: { type: "boolean", short: "v" },
-      "no-open": { type: "boolean" }
+      "no-open": { type: "boolean" },
+      "no-instructions": { type: "boolean" }
     }
   });
 
@@ -84,7 +86,8 @@ async function parseCli(args: string[]): Promise<CliOptions | undefined> {
     host: parsed.values.host ?? DEFAULT_HOST,
     port,
     open: parsed.values["no-open"] ? false : parsed.values.open ?? true,
-    strictPort: Boolean(parsed.values.port)
+    strictPort: Boolean(parsed.values.port),
+    defaultInstructions: !parsed.values["no-instructions"]
   };
 }
 
@@ -97,7 +100,8 @@ async function startWithPortFallback(options: CliOptions): Promise<RunningServer
       return await startKanbanServer({
         filePath: options.filePath,
         host: options.host,
-        port: options.port + index
+        port: options.port + index,
+        defaultInstructions: options.defaultInstructions
       });
     } catch (error) {
       lastError = error;
@@ -144,12 +148,13 @@ Usage:
   kb <board.md> [options]
 
 Options:
-  -p, --port <port>  Port to bind. Defaults to ${DEFAULT_PORT}.
-      --host <host>  Host to bind. Defaults to ${DEFAULT_HOST}.
-      --no-open      Do not open a browser after starting.
-      --open         Open a browser after starting. This is the default.
-  -v, --version      Print the package version.
-  -h, --help         Show this help.
+  -p, --port <port>     Port to bind. Defaults to ${DEFAULT_PORT}.
+      --host <host>     Host to bind. Defaults to ${DEFAULT_HOST}.
+      --no-open         Do not open a browser after starting.
+      --open            Open a browser after starting. This is the default.
+      --no-instructions Do not seed new boards with the default instructions block.
+  -v, --version         Print the package version.
+  -h, --help            Show this help.
 
 Markdown:
   # Todo
