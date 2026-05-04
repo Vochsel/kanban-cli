@@ -19,6 +19,7 @@ When working through tasks here, always follow these defaults and check after st
 # Doing
 
 # Done
+- [x] remove star on github as main cta on www
 - [x] release v0.2.3
 - [x] make sure license on www is same as https: //github.com/Vochsel/kanban-cli/blob/main/LICENSE
 - [x] move github to be next to npm button, and icons for both
