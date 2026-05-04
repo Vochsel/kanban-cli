@@ -809,15 +809,26 @@ section {
 }
 
 .qs-file-body {
+  background: var(--surface);
+  border: none;
   color: var(--ink);
+  display: block;
   font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 12.5px;
   line-height: 1.65;
   margin: 0;
   max-height: 320px;
+  min-height: 220px;
+  outline: none;
   overflow: auto;
   padding: 16px 18px;
+  resize: vertical;
   white-space: pre-wrap;
+  width: 100%;
+}
+
+.qs-file-body:focus {
+  background: rgba(12, 102, 228, 0.02);
 }
 
 /* Format ----------------------------------------------------------------- */

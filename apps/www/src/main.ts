@@ -437,7 +437,7 @@ function setupQuickstart(): void {
   const input = document.querySelector<HTMLInputElement>("[data-qs-input]");
   const browser = document.querySelector<HTMLElement>("[data-qs-browser]");
   const file = document.querySelector<HTMLElement>("[data-qs-file]");
-  const fileBody = document.querySelector<HTMLElement>("[data-qs-file-body]");
+  const fileBody = document.querySelector<HTMLTextAreaElement>("[data-qs-file-body]");
   const fileStatus = document.querySelector<HTMLElement>("[data-qs-file-status]");
   const boardMount = document.querySelector<HTMLElement>('[data-board="quickstart"]');
   if (!stage || !body || !input || !browser || !file || !fileBody || !boardMount) return;
@@ -507,12 +507,23 @@ function setupQuickstart(): void {
       showAddCard: true,
       editable: true,
     });
+    let suppressReparse = false;
     ctrl.onChange = (b) => {
-      fileBody.textContent = serializeMarkdown(b);
+      suppressReparse = true;
+      fileBody.value = serializeMarkdown(b);
       flashSaved();
     };
     ctrl.render();
-    fileBody.textContent = serializeMarkdown(quickstartSeed);
+    fileBody.value = serializeMarkdown(quickstartSeed);
+    fileBody.addEventListener("input", () => {
+      if (suppressReparse) {
+        suppressReparse = false;
+        return;
+      }
+      const parsed = parseMarkdown(fileBody.value);
+      ctrl.setBoard(parsed, { silent: true });
+      flashSaved();
+    });
     stage.classList.add("qs-stage-open");
   };
 
