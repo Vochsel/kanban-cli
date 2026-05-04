@@ -549,3 +549,54 @@ mountBoard('[data-board="hero"]', structuredClone(heroSeed), {
 
 setupFormatSection();
 setupQuickstart();
+setupCopyAiPrompt();
+
+function setupCopyAiPrompt(): void {
+  const btn = document.querySelector<HTMLButtonElement>("[data-copy-ai-prompt]");
+  const label = document.querySelector<HTMLElement>("[data-copy-ai-prompt-label]");
+  if (!btn || !label) return;
+
+  const prompt = [
+    "Set up a kanban board for this project using kanban-cli (https://github.com/Vochsel/kanban-cli).",
+    "",
+    "1. Find an existing TODO/tasks markdown file in the repo. If there isn't one, create TODO.md at the project root with these sections:",
+    "",
+    "   # Todo",
+    "   - [ ] First task",
+    "",
+    "   # Doing",
+    "",
+    "   # Done",
+    "",
+    "2. Run the CLI on that file in a terminal: `npx kanban-cli@latest <path/to/file.md>`",
+    "",
+    "It opens a local kanban board in the browser. The markdown file remains the source of truth — drag in the browser, the file updates; edit the file, the board reloads.",
+  ].join("\n");
+
+  btn.addEventListener("click", async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(prompt);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = prompt;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+      }
+      const original = label.textContent;
+      label.textContent = "Copied — paste in your AI tool";
+      btn.classList.add("is-copied");
+      setTimeout(() => {
+        label.textContent = original;
+        btn.classList.remove("is-copied");
+      }, 1800);
+    } catch (err) {
+      console.error(err);
+      label.textContent = "Copy failed";
+    }
+  });
+}

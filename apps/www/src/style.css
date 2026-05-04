@@ -201,6 +201,11 @@ footer {
   color: rgba(255, 255, 255, 0.55);
 }
 
+.btn.is-copied {
+  border-color: var(--green);
+  color: var(--green);
+}
+
 /* Hero ------------------------------------------------------------------- */
 
 main {
