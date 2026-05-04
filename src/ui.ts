@@ -37,6 +37,8 @@ import {
   List,
   ListTodo,
   MessageSquare,
+  Monitor,
+  Moon,
   Palette,
   Pause,
   Pencil,
@@ -48,6 +50,7 @@ import {
   Settings,
   ShieldCheck,
   Star,
+  Sun,
   Tag,
   Target,
   Trash2,
@@ -77,7 +80,10 @@ const browserIcons = {
   eye: renderLucideIcon(Eye),
   info: renderLucideIcon(Info),
   link: renderLucideIcon(Link2),
+  monitor: renderLucideIcon(Monitor),
+  moon: renderLucideIcon(Moon),
   palette: renderLucideIcon(Palette),
+  sun: renderLucideIcon(Sun),
   plus: renderLucideIcon(Plus),
   play: renderLucideIcon(Play),
   reload: renderLucideIcon(RefreshCw),
@@ -188,13 +194,34 @@ export function renderAppShell(options: AppShellOptions): string {
       --ok: #1f845a;
       --warn: #b8770a;
       --danger: #c9372c;
-      --shadow-card: 0 1px 1px rgba(9, 30, 66, 0.13), 0 0 1px rgba(9, 30, 66, 0.10);
-      --shadow-card-hover: 0 2px 4px rgba(9, 30, 66, 0.16), 0 0 1px rgba(9, 30, 66, 0.12);
+      --ink-rgb: 9, 30, 66;
+      --shadow-card: 0 1px 1px rgba(var(--ink-rgb), 0.13), 0 0 1px rgba(var(--ink-rgb), 0.10);
+      --shadow-card-hover: 0 2px 4px rgba(var(--ink-rgb), 0.16), 0 0 1px rgba(var(--ink-rgb), 0.12);
       --radius-sm: 4px;
       --radius: 6px;
       --radius-lg: 8px;
       --topbar-height: 52px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0c0f15;
+      --surface: #161a23;
+      --column-bg: #1d2230;
+      --column-bg-hover: #252b3b;
+      --ink: #e6edf3;
+      --ink-soft: #c9d1d9;
+      --muted: #8b95a5;
+      --line: #2a3142;
+      --line-strong: #3a4254;
+      --accent: #4c8ef5;
+      --accent-strong: #6fa3f7;
+      --accent-soft: rgba(76, 142, 245, 0.18);
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ink-rgb: 255, 255, 255;
     }
 
     * {
@@ -238,7 +265,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     button:hover {
-      background: rgba(9, 30, 66, 0.06);
+      background: rgba(var(--ink-rgb), 0.06);
       color: var(--ink);
     }
 
@@ -296,7 +323,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .board-title:hover {
-      background: rgba(9, 30, 66, 0.04);
+      background: rgba(var(--ink-rgb), 0.04);
     }
 
     .board-title:focus {
@@ -374,7 +401,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .theme-button:hover {
-      background: rgba(9, 30, 66, 0.06);
+      background: rgba(var(--ink-rgb), 0.06);
     }
 
     .theme-button .lucide-icon {
@@ -384,7 +411,7 @@ export function renderAppShell(options: AppShellOptions): string {
     .theme-swatch {
       align-items: center;
       background: var(--accent);
-      border: 1px solid rgba(9, 30, 66, 0.16);
+      border: 1px solid rgba(var(--ink-rgb), 0.16);
       border-radius: 999px;
       color: #ffffff;
       display: inline-flex;
@@ -404,7 +431,7 @@ export function renderAppShell(options: AppShellOptions): string {
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
-      box-shadow: 0 8px 24px rgba(9, 30, 66, 0.18), 0 0 1px rgba(9, 30, 66, 0.16);
+      box-shadow: 0 8px 24px rgba(var(--ink-rgb), 0.18), 0 0 1px rgba(var(--ink-rgb), 0.16);
       display: grid;
       gap: 6px;
       grid-template-columns: repeat(4, 28px);
@@ -648,7 +675,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .column-title:hover {
-      background: rgba(9, 30, 66, 0.04);
+      background: rgba(var(--ink-rgb), 0.04);
     }
 
     .column-title:focus {
@@ -661,7 +688,7 @@ export function renderAppShell(options: AppShellOptions): string {
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
-      box-shadow: 0 8px 24px rgba(9, 30, 66, 0.18), 0 0 1px rgba(9, 30, 66, 0.16);
+      box-shadow: 0 8px 24px rgba(var(--ink-rgb), 0.18), 0 0 1px rgba(var(--ink-rgb), 0.16);
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -719,7 +746,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .icon-choice:hover {
-      background: rgba(9, 30, 66, 0.06);
+      background: rgba(var(--ink-rgb), 0.06);
       color: var(--ink);
     }
 
@@ -797,7 +824,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .card-check {
-      accent-color: #0c66e4;
+      accent-color: var(--accent);
       cursor: pointer;
       height: 14px;
       justify-self: center;
@@ -828,7 +855,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .card-title:hover {
-      background: rgba(9, 30, 66, 0.04);
+      background: rgba(var(--ink-rgb), 0.04);
     }
 
     .card-title:focus {
@@ -859,7 +886,7 @@ export function renderAppShell(options: AppShellOptions): string {
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
-      box-shadow: 0 24px 48px rgba(9, 30, 66, 0.32), 0 0 1px rgba(9, 30, 66, 0.16);
+      box-shadow: 0 24px 48px rgba(var(--ink-rgb), 0.32), 0 0 1px rgba(var(--ink-rgb), 0.16);
       color: var(--ink);
       max-width: min(640px, 92vw);
       padding: 0;
@@ -867,7 +894,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .card-dialog::backdrop {
-      background: rgba(9, 30, 66, 0.5);
+      background: rgba(var(--ink-rgb), 0.5);
       backdrop-filter: blur(2px);
     }
 
@@ -908,7 +935,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .card-dialog-title:hover {
-      background: rgba(9, 30, 66, 0.04);
+      background: rgba(var(--ink-rgb), 0.04);
     }
 
     .card-dialog-title:focus {
@@ -1192,11 +1219,54 @@ export function renderAppShell(options: AppShellOptions): string {
       font-weight: 500;
     }
 
+    .theme-choices {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .theme-choice {
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      font-size: 13px;
+      gap: 6px;
+      padding: 14px 10px;
+      text-align: center;
+      transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+    }
+
+    .theme-choice:hover {
+      background: rgba(var(--ink-rgb), 0.04);
+    }
+
+    .theme-choice input[type="radio"] {
+      display: none;
+    }
+
+    .theme-choice .lucide-icon {
+      color: var(--muted);
+    }
+
+    .theme-choice:has(input:checked) {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .theme-choice:has(input:checked) .lucide-icon {
+      color: var(--accent);
+    }
+
     .context-menu {
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(9, 30, 66, 0.16), 0 0 1px rgba(9, 30, 66, 0.18);
+      box-shadow: 0 8px 24px rgba(var(--ink-rgb), 0.16), 0 0 1px rgba(var(--ink-rgb), 0.18);
       display: flex;
       flex-direction: column;
       gap: 1px;
@@ -1297,7 +1367,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .add-card:hover {
-      background: rgba(9, 30, 66, 0.08);
+      background: rgba(var(--ink-rgb), 0.08);
       color: var(--ink);
     }
 
@@ -1318,7 +1388,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .empty:hover {
-      background: rgba(9, 30, 66, 0.04);
+      background: rgba(var(--ink-rgb), 0.04);
       border-color: var(--line-strong);
       color: var(--ink-soft);
     }
@@ -1326,7 +1396,7 @@ export function renderAppShell(options: AppShellOptions): string {
     .add-column {
       align-items: center;
       align-self: flex-start;
-      background: rgba(9, 30, 66, 0.06);
+      background: rgba(var(--ink-rgb), 0.06);
       border-radius: var(--radius-lg);
       color: var(--ink-soft);
       display: inline-flex;
@@ -1344,7 +1414,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     .add-column:hover {
-      background: rgba(9, 30, 66, 0.12);
+      background: rgba(var(--ink-rgb), 0.12);
       color: var(--ink);
     }
 
@@ -1399,6 +1469,7 @@ export function renderAppShell(options: AppShellOptions): string {
         </button>
         <span id="status" class="status"><span id="statusIcon" class="status-icon">${browserIcons.statusSaving}</span><span id="statusText">Loading</span></span>
         <button id="copyBoardLink" class="ghost icon-button" type="button" aria-label="Copy file path" title="Copy file path">${browserIcons.link}</button>
+        <button id="themeToggle" class="ghost icon-button" type="button" aria-label="Toggle dark mode" title="Toggle dark mode" data-theme-toggle>${browserIcons.moon}</button>
         <button id="settingsButton" class="ghost icon-button" type="button" aria-label="Board settings" title="Board settings">${browserIcons.settings}</button>
         <button id="reload" class="ghost icon-button" type="button" aria-label="Reload" title="Reload">${browserIcons.reload}</button>
       </div>
@@ -1422,6 +1493,7 @@ export function renderAppShell(options: AppShellOptions): string {
         <h2 id="settingsDialogTitle" class="settings-nav-title">Settings</h2>
         <nav class="settings-nav-list">
           <button type="button" class="settings-nav-item is-active" data-settings-tab="instructions">${browserIcons.alignLeft}<span>Instructions</span></button>
+          <button type="button" class="settings-nav-item" data-settings-tab="appearance">${browserIcons.moon}<span>Appearance</span></button>
           <button type="button" class="settings-nav-item" data-settings-tab="markdown">${browserIcons.eye}<span>Markdown</span></button>
           <button type="button" class="settings-nav-item" data-settings-tab="sounds">${browserIcons.volume}<span>Sounds</span></button>
           <button type="button" class="settings-nav-item" data-settings-tab="about">${browserIcons.info}<span>About</span></button>
@@ -1438,6 +1510,26 @@ export function renderAppShell(options: AppShellOptions): string {
           <div class="settings-actions">
             <button type="button" class="ghost" id="settingsResetInstructions">Use default</button>
             <button type="button" class="ghost" id="settingsClearInstructions">Clear</button>
+          </div>
+        </section>
+        <section class="settings-section settings-panel" data-settings-panel="appearance">
+          <p class="settings-section-help">Choose how the board looks. Auto matches your operating system.</p>
+          <div class="theme-choices" role="radiogroup" aria-label="Theme mode">
+            <label class="theme-choice">
+              <input type="radio" name="settings-theme-mode" value="auto" />
+              ${browserIcons.monitor}
+              <span>Auto</span>
+            </label>
+            <label class="theme-choice">
+              <input type="radio" name="settings-theme-mode" value="light" />
+              ${browserIcons.sun}
+              <span>Light</span>
+            </label>
+            <label class="theme-choice">
+              <input type="radio" name="settings-theme-mode" value="dark" />
+              ${browserIcons.moon}
+              <span>Dark</span>
+            </label>
           </div>
         </section>
         <section class="settings-section settings-panel" data-settings-panel="markdown">
@@ -2377,6 +2469,60 @@ export function renderAppShell(options: AppShellOptions): string {
         if (settingsHeading) settingsHeading.textContent = settingsTabLabels[tab] || tab;
       });
     });
+
+    const THEME_PREF_KEY = "kanban-cli:theme-mode";
+    function getThemeMode() {
+      try {
+        const raw = window.localStorage?.getItem(THEME_PREF_KEY);
+        if (raw === "light" || raw === "dark" || raw === "auto") return raw;
+      } catch (_) { /* ignore */ }
+      return "auto";
+    }
+    function resolvedTheme(mode) {
+      if (mode === "light" || mode === "dark") return mode;
+      try {
+        return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      } catch (_) {
+        return "light";
+      }
+    }
+    function applyTheme(mode) {
+      const resolved = resolvedTheme(mode);
+      document.documentElement.setAttribute("data-theme", resolved);
+      const themeToggleEl = document.querySelector("#themeToggle");
+      if (themeToggleEl) {
+        themeToggleEl.innerHTML = resolved === "dark" ? ${JSON.stringify(browserIcons.sun)} : ${JSON.stringify(browserIcons.moon)};
+        themeToggleEl.setAttribute("aria-label", resolved === "dark" ? "Switch to light mode" : "Switch to dark mode");
+        themeToggleEl.setAttribute("title", resolved === "dark" ? "Switch to light mode" : "Switch to dark mode");
+      }
+      // Update the radios in the appearance panel.
+      document.querySelectorAll("input[name='settings-theme-mode']").forEach((input) => {
+        input.checked = input.value === mode;
+      });
+    }
+    function setThemeMode(mode) {
+      try { window.localStorage?.setItem(THEME_PREF_KEY, mode); } catch (_) { /* ignore */ }
+      applyTheme(mode);
+    }
+    applyTheme(getThemeMode());
+    document.querySelector("#themeToggle").addEventListener("click", () => {
+      // Header toggle is an explicit override: flip whatever is current.
+      const current = resolvedTheme(getThemeMode());
+      setThemeMode(current === "dark" ? "light" : "dark");
+    });
+    document.querySelectorAll("input[name='settings-theme-mode']").forEach((input) => {
+      input.addEventListener("change", () => {
+        if (input.checked) setThemeMode(input.value);
+      });
+    });
+    try {
+      const mq = window.matchMedia("(prefers-color-scheme: dark)");
+      const onSystemChange = () => {
+        if (getThemeMode() === "auto") applyTheme("auto");
+      };
+      if (mq.addEventListener) mq.addEventListener("change", onSystemChange);
+      else if (mq.addListener) mq.addListener(onSystemChange);
+    } catch (_) { /* ignore */ }
 
     const SOUND_PREF_KEY = "kanban-cli:sounds-enabled";
     let soundsEnabled = false;
