@@ -5,7 +5,7 @@
   "type": "module",
   "preferGlobal": true,
   "bin": {
-    "kb": "./dist/cli.js"
+    "kb": "dist/cli.js"
   },
   "files": [
     "dist",
