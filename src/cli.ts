@@ -78,6 +78,12 @@ async function parseCli(args: string[]): Promise<CliOptions | undefined> {
   }
 
   const filePaths = parsed.positionals;
+  if (filePaths.length === 0) {
+    const fallback = resolve(process.cwd(), "TODO.md");
+    if (await Bun.file(fallback).exists()) {
+      filePaths.push(fallback);
+    }
+  }
 
   const port = parsed.values.port ? Number(parsed.values.port) : DEFAULT_PORT;
 

@@ -20,10 +20,13 @@ Once you are completely done, push all changes to main
 # Doing <!-- icon: play -->
 
 # Done <!-- icon: double-tick -->
+- [x] add a new sound when all todo tasks are done and todo/doing is empty: also show confetti on board with react package
+- [x] right justify the delete button there is a weird gap currently
+- [x] Change add kanban card to this exactly: Add a "kanban" script to package.json that runs npx kanban-cli@latest [insert current todo file here] so the board can be opened with npm run kanban.
+- [x] only show implement now button if yolo features enabled
 - [x] on run cli set cli tab name (like in ghostty and terminal etc) to the todo file name
 - [x] since we run from cli, we could have auto-implement - add this as advanced yolo feature: run claude -p or codex from cli to auto start, or tidy cards etc: allow in settings (local storage) to specify the agent cli command, default to claude and codex. when enabled new button shows in header next to copy prompt, which is "Implement now". cli should output when each task is done, so maybe we need to wrap running each task in sub aiagent
 - [x] Add a setting (localstorage) for advanced yolo features
-- [x] add a new sound when all todo tasks are done and todo/doing is empty: also show confetti on board with react package
 - [x] move sounds toggle setting to a local storage setting per board, not in md itself
 - [x] default sounds on by default - make a little louder
 - [x] Create a settings tab for shortcuts, a list of preset cards to add to todo: first short cut is "add to package.json" which adds card to add npx kanban-cli@latest BOARD_FILE to package.json (fill board_file with actual TODO.md or current todo md)

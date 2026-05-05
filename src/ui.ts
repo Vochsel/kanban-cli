@@ -401,6 +401,10 @@ export function renderAppShell(options: AppShellOptions): string {
       transition: background-color 120ms ease, color 120ms ease, transform 120ms ease;
     }
 
+    .copy-prompt-btn[hidden] {
+      display: none;
+    }
+
     .copy-prompt-btn:hover {
       background: rgba(12, 102, 228, 0.18);
       color: var(--accent-strong);
@@ -874,7 +878,7 @@ export function renderAppShell(options: AppShellOptions): string {
       align-items: start;
       display: grid;
       gap: 4px;
-      grid-template-columns: 22px minmax(0, 1fr) 26px 26px;
+      grid-template-columns: 22px minmax(0, 1fr) 26px;
     }
 
     .card-top .card-check,
@@ -1584,6 +1588,39 @@ export function renderAppShell(options: AppShellOptions): string {
 
     @media (prefers-reduced-motion: reduce) {
       .confetti-layer { display: none; }
+    }
+
+    .completion-toast {
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 18px 48px rgba(var(--ink-rgb), 0.32), 0 0 1px rgba(var(--ink-rgb), 0.2);
+      color: var(--ink);
+      display: inline-flex;
+      font-size: 16px;
+      font-weight: 600;
+      gap: 10px;
+      left: 50%;
+      opacity: 0;
+      padding: 14px 22px;
+      pointer-events: none;
+      position: fixed;
+      top: 80px;
+      transform: translate(-50%, -12px) scale(0.95);
+      transition: opacity 200ms ease, transform 240ms cubic-bezier(0.2, 0.7, 0.3, 1.4);
+      z-index: 10000;
+    }
+
+    .completion-toast.is-shown {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
+
+    .completion-toast .lucide-icon {
+      color: var(--accent);
+      height: 20px;
+      width: 20px;
     }
 
     .add-card {
@@ -2898,9 +2935,9 @@ export function renderAppShell(options: AppShellOptions): string {
         id: "package-json",
         title: "Add to package.json",
         help: "Adds a Todo card to wire npx kanban-cli@latest into package.json scripts.",
-        cardTitle: "Add npm script for kanban",
-        cardDescription: (fileName) =>
-          'Add a "kanban" script to package.json that runs npx kanban-cli@latest ' + fileName + ' so the board can be opened with npm run kanban.'
+        cardTitle: (fileName) =>
+          'Add a "kanban" script to package.json that runs npx kanban-cli@latest ' + fileName + ' so the board can be opened with npm run kanban.',
+        cardDescription: ""
       }
     ];
 
@@ -2946,12 +2983,16 @@ export function renderAppShell(options: AppShellOptions): string {
         setStatus("No Todo column found", "error");
         return;
       }
+      const fileName = state.fileName || "TODO.md";
+      const title = typeof preset.cardTitle === "function"
+        ? preset.cardTitle(fileName)
+        : preset.cardTitle;
       const description = typeof preset.cardDescription === "function"
-        ? preset.cardDescription(state.fileName || "TODO.md")
+        ? preset.cardDescription(fileName)
         : preset.cardDescription;
       const card = {
         id: createId("card"),
-        title: preset.cardTitle,
+        title,
         description: description || "",
         done: false
       };
@@ -3168,9 +3209,14 @@ export function renderAppShell(options: AppShellOptions): string {
 
     function playCompletionSound() {
       if (!soundsEnabled) return;
-      const notes = [523.25, 659.25, 783.99, 1046.5];
+      // Triumphant arpeggio: C-E-G-C-E-G-C with a sustained final note
+      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5, 1568.0, 2093.0];
       notes.forEach((freq, i) => {
-        setTimeout(() => playTone(freq, 0.22, 0.24, "triangle"), i * 110);
+        const isFinal = i === notes.length - 1;
+        setTimeout(
+          () => playTone(freq, isFinal ? 0.9 : 0.18, isFinal ? 0.4 : 0.32, "triangle"),
+          i * 95
+        );
       });
     }
 
@@ -3232,7 +3278,24 @@ export function renderAppShell(options: AppShellOptions): string {
       if (becameEmpty) {
         playCompletionSound();
         showConfetti();
+        showCompletionToast();
       }
+    }
+
+    function showCompletionToast() {
+      const existing = document.querySelector(".completion-toast");
+      if (existing) existing.remove();
+      const toast = document.createElement("div");
+      toast.className = "completion-toast";
+      toast.setAttribute("role", "status");
+      toast.setAttribute("aria-live", "polite");
+      toast.innerHTML = icons.statusSaved + "<span>All done — nice work!</span>";
+      document.body.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add("is-shown"));
+      setTimeout(() => {
+        toast.classList.remove("is-shown");
+        setTimeout(() => toast.remove(), 320);
+      }, 2600);
     }
 
     function cardColumnTitleMap(board) {
