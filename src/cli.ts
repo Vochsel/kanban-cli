@@ -27,8 +27,14 @@ async function main(args: string[] = Bun.argv.slice(2)): Promise<void> {
 
   const version = await packageVersion();
   const fileLines = running.filePaths.map((p, i) => `  ${i === 0 ? "›" : " "} ${p}`).join("\n");
+  const intro =
+    running.filePaths.length === 0
+      ? "No board files. Open the URL to create one or restart with paths."
+      : running.filePaths.length > 1
+        ? `Boards (${running.filePaths.length}):\n${fileLines}`
+        : `File: ${running.filePaths[0]}`;
   console.log(`kanban-cli v${version} is running
-${running.filePaths.length > 1 ? `Boards (${running.filePaths.length}):\n${fileLines}` : `File: ${running.filePaths[0]}`}
+${intro}
 Board: ${running.url}
 Press Ctrl-C to stop.`);
 
@@ -70,12 +76,6 @@ async function parseCli(args: string[]): Promise<CliOptions | undefined> {
   }
 
   const filePaths = parsed.positionals;
-
-  if (filePaths.length === 0) {
-    printHelp();
-    process.exitCode = 1;
-    return undefined;
-  }
 
   const port = parsed.values.port ? Number(parsed.values.port) : DEFAULT_PORT;
 

@@ -2070,6 +2070,7 @@ export function renderAppShell(options: AppShellOptions): string {
         const response = await fetch("/api/board" + boardQuery(), { headers: { "Accept": "application/json" } });
         if (!response.ok) throw new Error(await response.text());
         const payload = await response.json();
+        const prevColumnsByCard = cardColumnTitleMap(state.board);
         state.board = payload.board;
         state.baseBoard = JSON.parse(JSON.stringify(payload.board));
         state.fileVersion = payload.version;
@@ -2078,6 +2079,7 @@ export function renderAppShell(options: AppShellOptions): string {
         state.isSaving = false;
         applyBoardChrome();
         renderBoard();
+        if (reason === "external") playSoundsForBoardDiff(prevColumnsByCard, state.board);
         setStatus(reason === "external" ? "Reloaded from disk" : "Saved", "saved");
       } catch (error) {
         console.error(error);
@@ -2098,6 +2100,8 @@ export function renderAppShell(options: AppShellOptions): string {
 
         if (!payload.version || payload.version === state.fileVersion) return;
 
+        const prevColumnsByCard = cardColumnTitleMap(state.board);
+
         if (state.isDirty) {
           // Disk diverged while we have unsaved local edits — three-way merge.
           syncStateFromDom();
@@ -2108,6 +2112,7 @@ export function renderAppShell(options: AppShellOptions): string {
           state.fileName = payload.fileName;
           applyBoardChrome();
           renderBoard();
+          playSoundsForBoardDiff(prevColumnsByCard, state.board);
           setStatus("Merged disk changes", "saved");
           // Push the merged result back so disk and ui converge.
           scheduleSave();
@@ -2118,6 +2123,7 @@ export function renderAppShell(options: AppShellOptions): string {
           state.fileName = payload.fileName;
           applyBoardChrome();
           renderBoard();
+          playSoundsForBoardDiff(prevColumnsByCard, state.board);
           setStatus("Reloaded from disk", "saved");
         }
       } catch (error) {
@@ -2792,6 +2798,31 @@ export function renderAppShell(options: AppShellOptions): string {
       setTimeout(() => playTone(990, 0.20, 0.10, "sine"), 90);
     }
 
+    function cardColumnTitleMap(board) {
+      const map = new Map();
+      if (!board || !board.columns) return map;
+      for (const col of board.columns) {
+        const title = (col.title || "").trim().toLowerCase();
+        for (const card of col.cards || []) {
+          if (card && card.id) map.set(card.id, title);
+        }
+      }
+      return map;
+    }
+
+    function playSoundsForBoardDiff(prevMap, nextBoard) {
+      if (!prevMap || prevMap.size === 0) return;
+      const nextMap = cardColumnTitleMap(nextBoard);
+      let didDoing = false;
+      let didDone = false;
+      nextMap.forEach((title, cardId) => {
+        const prev = prevMap.get(cardId);
+        if (prev === undefined || prev === title) return;
+        if (title === "doing" && !didDoing) { playMoveDoingSound(); didDoing = true; }
+        else if (title === "done" && !didDone) { playMoveDoneSound(); didDone = true; }
+      });
+    }
+
     document.querySelector("#settingsSoundsPreviewDoing").addEventListener("click", () => {
       // Preview ignores the enabled flag so the user can hear before turning it on.
       playTone(560, 0.14, 0.08, "sine");
@@ -3159,6 +3190,253 @@ export function renderAppShell(options: AppShellOptions): string {
     boardTitleEl.placeholder = state.fileName;
     loadBoard("initial");
     setInterval(checkDiskChanges, 1500);
+  </script>
+</body>
+</html>`;
+}
+
+export interface EmptyShellOptions {
+  creationDir: string;
+  defaultFileName: string;
+}
+
+export function renderEmptyShell(options: EmptyShellOptions): string {
+  const defaultFileName = options.defaultFileName;
+  const creationDir = options.creationDir;
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>kanban-cli</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f5f7;
+      --surface: #ffffff;
+      --ink: #172b4d;
+      --ink-soft: #344563;
+      --muted: #5e6c84;
+      --line: #dfe1e6;
+      --accent: #0c66e4;
+      --accent-strong: #0747a6;
+      --shadow: 0 1px 2px rgba(9, 30, 66, 0.08), 0 0 1px rgba(9, 30, 66, 0.10);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0c0f15;
+        --surface: #161a23;
+        --ink: #e6edf3;
+        --ink-soft: #c9d1d9;
+        --muted: #8b95a5;
+        --line: #2a3142;
+        --accent: #4c8ef5;
+        --accent-strong: #6fa3f7;
+        --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 0 1px rgba(0,0,0,0.2);
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.5;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .empty-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      max-width: 520px;
+      width: 100%;
+      padding: 28px;
+    }
+    .empty-eyebrow {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0 0 8px;
+    }
+    .empty-title {
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+    .empty-body {
+      color: var(--ink-soft);
+      margin: 0 0 20px;
+    }
+    .empty-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn {
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      gap: 6px;
+      font: inherit;
+      height: 36px;
+      padding: 0 14px;
+      background: var(--surface);
+      color: var(--ink);
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--accent-strong);
+      border-color: var(--accent-strong);
+      color: #fff;
+    }
+    .btn:disabled { opacity: 0.6; cursor: progress; }
+    .empty-secondary {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+    .empty-secondary h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 0 0 8px;
+    }
+    .empty-secondary p {
+      color: var(--ink-soft);
+      margin: 0 0 8px;
+    }
+    code, .code-line {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      background: rgba(9, 30, 66, 0.06);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 12.5px;
+    }
+    @media (prefers-color-scheme: dark) {
+      code, .code-line { background: rgba(255,255,255,0.06); }
+    }
+    .code-line {
+      display: block;
+      padding: 10px 12px;
+      margin-top: 6px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .empty-status {
+      color: var(--muted);
+      margin: 12px 0 0;
+      min-height: 18px;
+      font-size: 12.5px;
+    }
+    .empty-status[data-tone="error"] { color: #c9372c; }
+    .empty-status[data-tone="ok"] { color: #1f845a; }
+    .empty-name-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .empty-name-row input {
+      flex: 1;
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+    }
+    .empty-name-row input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(76, 142, 245, 0.18);
+    }
+  </style>
+</head>
+<body>
+  <main class="empty-card">
+    <p class="empty-eyebrow">kanban-cli</p>
+    <h1 class="empty-title">No board open yet</h1>
+    <p class="empty-body">
+      kanban-cli turns markdown files into local kanban boards. Create a starter <code>${escapeHtml(defaultFileName)}</code>
+      in your current directory, or restart the CLI with one or more markdown files.
+    </p>
+
+    <div class="empty-name-row">
+      <input id="emptyFileName" type="text" value="${escapeHtml(defaultFileName)}" spellcheck="false" autocomplete="off">
+    </div>
+    <div class="empty-actions">
+      <button id="emptyCreateBtn" class="btn btn-primary" type="button">Create board file</button>
+    </div>
+    <p class="empty-status" id="emptyStatus">Will be created in <code>${escapeHtml(creationDir)}</code></p>
+
+    <div class="empty-secondary">
+      <h2>Or restart with a file</h2>
+      <p>Pass one or more markdown paths to the CLI:</p>
+      <code class="code-line">npx kanban-cli@latest path/to/board.md</code>
+    </div>
+  </main>
+  <script>
+    (function () {
+      const btn = document.getElementById("emptyCreateBtn");
+      const input = document.getElementById("emptyFileName");
+      const status = document.getElementById("emptyStatus");
+
+      function setStatus(message, tone) {
+        status.textContent = message;
+        if (tone) status.dataset.tone = tone;
+        else delete status.dataset.tone;
+      }
+
+      async function create() {
+        const name = (input.value || "").trim();
+        if (!name) {
+          setStatus("File name is required", "error");
+          input.focus();
+          return;
+        }
+        btn.disabled = true;
+        setStatus("Creating " + name + "…");
+        try {
+          const response = await fetch("/api/boards", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name })
+          });
+          if (!response.ok) {
+            const text = await response.text();
+            throw new Error(text || "Request failed");
+          }
+          setStatus("Created. Opening board…", "ok");
+          location.replace("/");
+        } catch (error) {
+          console.error(error);
+          setStatus("Failed: " + (error && error.message ? error.message : error), "error");
+          btn.disabled = false;
+        }
+      }
+
+      btn.addEventListener("click", create);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          create();
+        }
+      });
+    }());
   </script>
 </body>
 </html>`;

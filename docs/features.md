@@ -15,11 +15,13 @@ When working through tasks here, always follow these defaults and check after st
 - [ ] since we run from cli, we could have auto-implement: run claude -p or codex from cli to auto start, or tidy cards etc
 
 # Todo
-- [ ] Make sure sounds play even when disk updates trigger movement
 
 # Doing <!-- icon: play -->
 
 # Done <!-- icon: double-tick -->
+- [x] make sure if run with no markdown file, the web ui still opens, but with a button offering to create TODO.md or explaining to rerun with 1 or more md files in cli args
+- [x] $npx kanban-cli@latest board.md on homepage should copy to clipboard
+- [x] Make sure sounds play even when disk updates trigger movement
 - [x] Make version v0.2.4
 - [x] add a changelog to the www page, and update dynamically based on git history, but human readable: stylize visually as its own kanban board, but columns per date released
 - [x] change kanban-cli text on localhost kanban page to the favicon svg we created, and on click go to kanban-cli.vochsel.com

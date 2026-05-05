@@ -550,6 +550,7 @@ mountBoard('[data-board="hero"]', structuredClone(heroSeed), {
 setupFormatSection();
 setupQuickstart();
 setupCopyAiPrompt();
+setupCopyCliCommand();
 setupChangelog();
 
 interface GithubRelease {
@@ -689,6 +690,46 @@ function formatReleaseDate(iso: string | null): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+async function copyText(text: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand("copy");
+  ta.remove();
+}
+
+function setupCopyCliCommand(): void {
+  const buttons = document.querySelectorAll<HTMLButtonElement>("[data-copy-cli-command]");
+  buttons.forEach((btn) => {
+    const command = btn.dataset.cliCommand?.trim();
+    if (!command) return;
+    const label = btn.querySelector<HTMLElement>("[data-copy-cli-command-label]");
+    btn.addEventListener("click", async () => {
+      try {
+        await copyText(command);
+        if (!label) return;
+        const original = label.textContent;
+        label.textContent = "Copied to clipboard";
+        btn.classList.add("is-copied");
+        setTimeout(() => {
+          label.textContent = original;
+          btn.classList.remove("is-copied");
+        }, 1600);
+      } catch (err) {
+        console.error(err);
+        if (label) label.textContent = "Copy failed";
+      }
+    });
+  });
 }
 
 function setupCopyAiPrompt(): void {

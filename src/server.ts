@@ -1,7 +1,7 @@
-import { basename, dirname, resolve } from "node:path";
+import { basename, dirname, isAbsolute, resolve } from "node:path";
 import { mkdir, stat, writeFile } from "node:fs/promises";
 import { createDefaultBoard, normalizeBoard, parseMarkdown, serializeBoard, type Board } from "./markdown";
-import { renderAppShell, type BoardSummary } from "./ui";
+import { renderAppShell, renderEmptyShell, type BoardSummary } from "./ui";
 
 export interface ServerOptions {
   filePaths: string[];
@@ -27,10 +27,7 @@ interface BoardEntry {
 
 export async function startKanbanServer(options: ServerOptions): Promise<RunningServer> {
   const filePaths = options.filePaths.map((p) => resolve(p));
-
-  if (filePaths.length === 0) {
-    throw new Error("At least one board file path is required");
-  }
+  const creationDir = process.cwd();
 
   for (const filePath of filePaths) {
     await ensureBoardFile(filePath, { defaultInstructions: options.defaultInstructions });
@@ -42,9 +39,30 @@ export async function startKanbanServer(options: ServerOptions): Promise<Running
     fileName: basename(filePath)
   }));
 
-  const boardsById = new Map(boards.map((b) => [b.id, b]));
+  const boardsById = new Map<string, BoardEntry>(boards.map((b) => [b.id, b]));
+  let nextBoardIndex = boards.length;
 
-  function resolveBoard(url: URL): BoardEntry {
+  async function addBoard(rawName: string): Promise<BoardEntry> {
+    const trimmed = rawName.trim();
+    if (!trimmed) throw new Error("File name is required");
+    if (trimmed.includes("\0")) throw new Error("Invalid file name");
+    const filePath = isAbsolute(trimmed) ? resolve(trimmed) : resolve(creationDir, trimmed);
+    const existing = boards.find((b) => b.filePath === filePath);
+    if (existing) return existing;
+    await ensureBoardFile(filePath, { defaultInstructions: options.defaultInstructions });
+    const entry: BoardEntry = {
+      id: "b" + nextBoardIndex,
+      filePath,
+      fileName: basename(filePath)
+    };
+    nextBoardIndex += 1;
+    boards.push(entry);
+    boardsById.set(entry.id, entry);
+    return entry;
+  }
+
+  function resolveBoard(url: URL): BoardEntry | undefined {
+    if (boards.length === 0) return undefined;
     const id = url.searchParams.get("board");
     if (id && boardsById.has(id)) return boardsById.get(id)!;
     return boards[0]!;
@@ -61,14 +79,25 @@ export async function startKanbanServer(options: ServerOptions): Promise<Running
           return json({ boards: boards.map((b) => ({ id: b.id, fileName: b.fileName, filePath: b.filePath })) });
         }
 
+        if (url.pathname === "/api/boards" && request.method === "POST") {
+          const body = await request.json().catch(() => ({}));
+          const name = typeof (body as { name?: unknown }).name === "string" && (body as { name: string }).name.trim().length > 0
+            ? (body as { name: string }).name
+            : "TODO.md";
+          const entry = await addBoard(name);
+          return json({ id: entry.id, fileName: entry.fileName, filePath: entry.filePath, creationDir });
+        }
+
         if (url.pathname === "/api/board" && request.method === "GET") {
           const entry = resolveBoard(url);
+          if (!entry) return json({ error: "No boards available" }, 404);
           const { board, version } = await readBoardWithVersion(entry.filePath);
           return json({ id: entry.id, board, fileName: entry.fileName, filePath: entry.filePath, version });
         }
 
         if (url.pathname === "/api/board/raw" && request.method === "GET") {
           const entry = resolveBoard(url);
+          if (!entry) return json({ error: "No boards available" }, 404);
           const content = await Bun.file(entry.filePath).text();
           return new Response(content, {
             headers: {
@@ -80,6 +109,7 @@ export async function startKanbanServer(options: ServerOptions): Promise<Running
 
         if (url.pathname === "/api/board" && request.method === "PUT") {
           const entry = resolveBoard(url);
+          if (!entry) return json({ error: "No boards available" }, 404);
           const body = await request.json();
           const { board, version } = await writeBoardWithVersion(entry.filePath, body);
           return json({ id: entry.id, board, fileName: entry.fileName, filePath: entry.filePath, version });
@@ -92,6 +122,9 @@ export async function startKanbanServer(options: ServerOptions): Promise<Running
         }
 
         if (request.method === "GET") {
+          if (boards.length === 0) {
+            return html(renderEmptyShell({ creationDir, defaultFileName: "TODO.md" }));
+          }
           const summary: BoardSummary[] = boards.map((b) => ({ id: b.id, fileName: b.fileName, filePath: b.filePath }));
           const initial = boards[0]!;
           return html(
