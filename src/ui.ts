@@ -1123,7 +1123,8 @@ export function renderAppShell(options: AppShellOptions): string {
       display: grid;
       gap: 0;
       grid-template-columns: 180px 1fr;
-      max-height: min(560px, 80vh);
+      height: min(720px, 88vh);
+      max-height: 88vh;
       padding: 0;
     }
 
@@ -1294,7 +1295,9 @@ export function renderAppShell(options: AppShellOptions): string {
       display: flex;
       flex-direction: column;
       font-size: 13px;
-      gap: 6px;
+      gap: 8px;
+      justify-content: center;
+      min-height: 84px;
       padding: 14px 10px;
       text-align: center;
       transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
@@ -1310,6 +1313,10 @@ export function renderAppShell(options: AppShellOptions): string {
 
     .theme-choice .lucide-icon {
       color: var(--muted);
+      display: block;
+      height: 22px;
+      margin: 0 auto;
+      width: 22px;
     }
 
     .theme-choice:has(input:checked) {
@@ -1389,15 +1396,11 @@ export function renderAppShell(options: AppShellOptions): string {
       margin: 3px 4px;
     }
 
-    .raw-dialog {
-      max-width: min(720px, 92vw);
-    }
-
     .raw-content {
+      flex: 1 1 auto;
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
       font-size: 12px;
-      max-height: 70vh;
-      min-height: 360px;
+      min-height: 240px;
       white-space: pre;
     }
 
@@ -1557,15 +1560,6 @@ export function renderAppShell(options: AppShellOptions): string {
       <div id="board" class="board" aria-live="polite"></div>
     </main>
   </div>
-  <dialog id="rawDialog" class="card-dialog raw-dialog" aria-labelledby="rawDialogTitle">
-    <form method="dialog" class="card-dialog-form">
-      <header class="card-dialog-head">
-        <h2 id="rawDialogTitle" class="card-dialog-heading">Raw markdown</h2>
-        <button type="submit" class="icon-button" aria-label="Close" title="Close">${browserIcons.close}</button>
-      </header>
-      <textarea id="rawContent" class="card-dialog-description raw-content" readonly aria-label="Raw markdown content"></textarea>
-    </form>
-  </dialog>
   <dialog id="settingsDialog" class="card-dialog settings-dialog" aria-labelledby="settingsDialogTitle">
     <form method="dialog" class="card-dialog-form settings-dialog-form">
       <aside class="settings-nav" aria-label="Settings sections">
@@ -1612,10 +1606,8 @@ export function renderAppShell(options: AppShellOptions): string {
           </div>
         </section>
         <section class="settings-section settings-panel" data-settings-panel="markdown">
-          <p class="settings-section-help">Inspect the file contents on disk.</p>
-          <div class="settings-actions" style="justify-content: flex-start">
-            <button type="button" class="ghost" id="settingsViewRaw">View raw markdown</button>
-          </div>
+          <p class="settings-section-help">The file contents on disk. Read-only.</p>
+          <textarea id="settingsRawMarkdown" class="card-dialog-description raw-content" readonly aria-label="Raw markdown content" placeholder="Loading…"></textarea>
         </section>
         <section class="settings-section settings-panel" data-settings-panel="sounds">
           <p class="settings-section-help">Play a small sound when a card moves into Doing or Done. Off by default.</p>
@@ -1709,9 +1701,6 @@ export function renderAppShell(options: AppShellOptions): string {
     const settingsButtonEl = document.querySelector("#settingsButton");
     const settingsResetEl = document.querySelector("#settingsResetInstructions");
     const settingsClearEl = document.querySelector("#settingsClearInstructions");
-    const settingsViewRawEl = document.querySelector("#settingsViewRaw");
-    const rawDialogEl = document.querySelector("#rawDialog");
-    const rawContentEl = document.querySelector("#rawContent");
     const DEFAULT_INSTRUCTIONS = ${JSON.stringify(DEFAULT_INSTRUCTIONS)};
     const statusEl = document.querySelector("#status");
     const statusIconEl = document.querySelector("#statusIcon");
@@ -2858,31 +2847,6 @@ export function renderAppShell(options: AppShellOptions): string {
       }
     });
 
-    settingsViewRawEl.addEventListener("click", () => openRawDialog());
-
-    rawDialogEl.addEventListener("click", (event) => {
-      if (event.target === rawDialogEl) {
-        if (rawDialogEl.open) rawDialogEl.close();
-      }
-    });
-
-    async function openRawDialog() {
-      rawContentEl.value = "Loading…";
-      if (typeof rawDialogEl.showModal === "function") {
-        rawDialogEl.showModal();
-      } else {
-        rawDialogEl.setAttribute("open", "");
-      }
-      try {
-        const response = await fetch("/api/board/raw" + boardQuery(), { headers: { "Accept": "text/markdown" } });
-        if (!response.ok) throw new Error(await response.text());
-        rawContentEl.value = await response.text();
-        rawContentEl.scrollTop = 0;
-      } catch (error) {
-        console.error(error);
-        rawContentEl.value = "Failed to load: " + (error && error.message ? error.message : error);
-      }
-    }
 
     function openSettingsDialog() {
       settingsInstructionsEl.value = state.board.instructions ?? "";
@@ -2890,6 +2854,21 @@ export function renderAppShell(options: AppShellOptions): string {
         settingsDialogEl.showModal();
       } else {
         settingsDialogEl.setAttribute("open", "");
+      }
+      loadSettingsRawMarkdown();
+    }
+
+    async function loadSettingsRawMarkdown() {
+      const el = document.querySelector("#settingsRawMarkdown");
+      if (!el) return;
+      el.value = "";
+      try {
+        const response = await fetch("/api/board/raw" + boardQuery(), { headers: { "Accept": "text/markdown" } });
+        if (!response.ok) throw new Error(await response.text());
+        el.value = await response.text();
+      } catch (error) {
+        console.error(error);
+        el.value = "Could not load raw markdown.";
       }
     }
 
