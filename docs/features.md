@@ -14,13 +14,19 @@ Once you are completely done, push all changes to main
 # Backlog <!-- icon: calendar -->
 - [ ] Potentially support yaml in parallel
 - [ ] Add labels/category support for cards
-- [ ] since we run from cli, we could have auto-implement: run claude -p or codex from cli to auto start, or tidy cards etc
 
 # Todo
 
 # Doing <!-- icon: play -->
 
 # Done <!-- icon: double-tick -->
+- [x] on run cli set cli tab name (like in ghostty and terminal etc) to the todo file name
+- [x] since we run from cli, we could have auto-implement - add this as advanced yolo feature: run claude -p or codex from cli to auto start, or tidy cards etc: allow in settings (local storage) to specify the agent cli command, default to claude and codex. when enabled new button shows in header next to copy prompt, which is "Implement now". cli should output when each task is done, so maybe we need to wrap running each task in sub aiagent
+- [x] Add a setting (localstorage) for advanced yolo features
+- [x] add a new sound when all todo tasks are done and todo/doing is empty: also show confetti on board with react package
+- [x] move sounds toggle setting to a local storage setting per board, not in md itself
+- [x] default sounds on by default - make a little louder
+- [x] Create a settings tab for shortcuts, a list of preset cards to add to todo: first short cut is "add to package.json" which adds card to add npx kanban-cli@latest BOARD_FILE to package.json (fill board_file with actual TODO.md or current todo md)
 - [x] set the opengraph image dynamically of www homepage to advertise the simple npx command and icon etc
 - [x] on www, the shape of a board section, arrow should be two ways you can edit text or ui
 - [x] $npx kanban-cli@latest board.md on homepage should copy to clipboard: you did this, but it needs to use a toast for copied to clipboard not change pill contents

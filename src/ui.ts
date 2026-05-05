@@ -102,7 +102,8 @@ const browserIcons = {
   statusSaving: renderLucideIcon(LoaderCircle),
   trash: renderLucideIcon(Trash2),
   volume: renderLucideIcon(Volume2),
-  volumeMute: renderLucideIcon(VolumeX)
+  volumeMute: renderLucideIcon(VolumeX),
+  zap: renderLucideIcon(Zap)
 } satisfies Record<string, string>;
 
 const columnIconChoices: Array<{ name: string; label: string; icon: IconNode }> = [
@@ -413,6 +414,21 @@ export function renderAppShell(options: AppShellOptions): string {
     .copy-prompt-btn .lucide-icon {
       height: 14px;
       width: 14px;
+    }
+
+    .implement-btn {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .implement-btn:hover {
+      background: var(--accent-strong);
+      color: #ffffff;
+    }
+
+    .implement-btn:disabled {
+      cursor: progress;
+      opacity: 0.7;
     }
 
     @media (max-width: 720px) {
@@ -1280,13 +1296,142 @@ export function renderAppShell(options: AppShellOptions): string {
       font-weight: 500;
     }
 
+    .settings-yolo-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .settings-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .settings-field-label {
+      color: var(--ink);
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .settings-field-input {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 13px;
+      height: 32px;
+      padding: 0 10px;
+    }
+
+    .settings-field-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+      outline: none;
+    }
+
+    .settings-field-help {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .settings-field-help code {
+      background: rgba(var(--ink-rgb), 0.06);
+      border-radius: 4px;
+      font-size: 11.5px;
+      padding: 1px 5px;
+    }
+
+    .shortcut-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .shortcut-item {
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      display: flex;
+      gap: 12px;
+      padding: 10px 12px;
+    }
+
+    .shortcut-item-icon {
+      align-items: center;
+      background: var(--accent-soft);
+      border-radius: 999px;
+      color: var(--accent);
+      display: inline-flex;
+      flex: 0 0 auto;
+      height: 32px;
+      justify-content: center;
+      width: 32px;
+    }
+
+    .shortcut-item-icon .lucide-icon {
+      height: 16px;
+      width: 16px;
+    }
+
+    .shortcut-item-body {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .shortcut-item-title {
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+      margin: 0 0 2px;
+    }
+
+    .shortcut-item-help {
+      color: var(--muted);
+      font-size: 12.5px;
+      margin: 0;
+    }
+
+    .shortcut-item-action {
+      align-items: center;
+      background: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      flex: 0 0 auto;
+      font-size: 12.5px;
+      font-weight: 500;
+      gap: 4px;
+      height: 30px;
+      padding: 0 12px;
+    }
+
+    .shortcut-item-action:hover {
+      background: var(--accent-strong);
+      border-color: var(--accent-strong);
+      color: #fff;
+    }
+
+    .shortcut-item-action.is-flash {
+      background: var(--ok);
+      border-color: var(--ok);
+    }
+
     .theme-choices {
       display: grid;
       gap: 8px;
       grid-template-columns: repeat(3, 1fr);
     }
 
-    .theme-choice {
+    .theme-choices .theme-choice {
       align-items: center;
       background: var(--surface);
       border: 1px solid var(--line);
@@ -1296,22 +1441,25 @@ export function renderAppShell(options: AppShellOptions): string {
       flex-direction: column;
       font-size: 13px;
       gap: 8px;
+      height: auto;
       justify-content: center;
       min-height: 84px;
       padding: 14px 10px;
       text-align: center;
       transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+      width: auto;
     }
 
-    .theme-choice:hover {
+    .theme-choices .theme-choice:hover {
       background: rgba(var(--ink-rgb), 0.04);
+      transform: none;
     }
 
-    .theme-choice input[type="radio"] {
+    .theme-choices .theme-choice input[type="radio"] {
       display: none;
     }
 
-    .theme-choice .lucide-icon {
+    .theme-choices .theme-choice .lucide-icon {
       color: var(--muted);
       display: block;
       height: 22px;
@@ -1319,13 +1467,13 @@ export function renderAppShell(options: AppShellOptions): string {
       width: 22px;
     }
 
-    .theme-choice:has(input:checked) {
+    .theme-choices .theme-choice:has(input:checked) {
       background: var(--accent-soft);
       border-color: var(--accent);
       color: var(--accent);
     }
 
-    .theme-choice:has(input:checked) .lucide-icon {
+    .theme-choices .theme-choice:has(input:checked) .lucide-icon {
       color: var(--accent);
     }
 
@@ -1406,6 +1554,36 @@ export function renderAppShell(options: AppShellOptions): string {
 
     .column-foot {
       padding: 4px 8px 8px;
+    }
+
+    .confetti-layer {
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      position: fixed;
+      z-index: 9999;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      top: -12px;
+      will-change: transform, opacity;
+      animation: kanban-confetti-fall var(--confetti-duration, 2800ms) cubic-bezier(0.2, 0.6, 0.4, 1) var(--confetti-delay, 0ms) forwards;
+    }
+
+    @keyframes kanban-confetti-fall {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0);
+      }
+      100% {
+        opacity: 0.85;
+        transform: translate(var(--confetti-drift, 0px), 110vh) rotate(var(--confetti-spin, 540deg));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .confetti-layer { display: none; }
     }
 
     .add-card {
@@ -1545,6 +1723,9 @@ export function renderAppShell(options: AppShellOptions): string {
       <button id="copyPromptBtn" class="ghost copy-prompt-btn" type="button" title="Copy a prompt to start implementing the Todo column">
         ${browserIcons.play}<span>Copy prompt to start implementing</span>
       </button>
+      <button id="implementNowBtn" class="ghost copy-prompt-btn implement-btn" type="button" data-yolo-only title="Run the configured agent CLI against this board" hidden>
+        ${browserIcons.rocket}<span>Implement now</span>
+      </button>
       <div class="top-actions">
         <button id="themeButton" class="theme-button" type="button" aria-label="Board theme color" title="Board theme color">
           <span class="theme-swatch" id="themeSwatch">${browserIcons.palette}</span>
@@ -1566,9 +1747,11 @@ export function renderAppShell(options: AppShellOptions): string {
         <h2 id="settingsDialogTitle" class="settings-nav-title">Settings</h2>
         <nav class="settings-nav-list">
           <button type="button" class="settings-nav-item is-active" data-settings-tab="instructions">${browserIcons.alignLeft}<span>Instructions</span></button>
+          <button type="button" class="settings-nav-item" data-settings-tab="shortcuts">${browserIcons.zap}<span>Shortcuts</span></button>
           <button type="button" class="settings-nav-item" data-settings-tab="appearance">${browserIcons.moon}<span>Appearance</span></button>
           <button type="button" class="settings-nav-item" data-settings-tab="markdown">${browserIcons.eye}<span>Markdown</span></button>
           <button type="button" class="settings-nav-item" data-settings-tab="sounds">${browserIcons.volume}<span>Sounds</span></button>
+          <button type="button" class="settings-nav-item" data-settings-tab="advanced">${browserIcons.rocket}<span>Advanced</span></button>
           <button type="button" class="settings-nav-item" data-settings-tab="about">${browserIcons.info}<span>About</span></button>
         </nav>
       </aside>
@@ -1584,6 +1767,10 @@ export function renderAppShell(options: AppShellOptions): string {
             <button type="button" class="ghost" id="settingsResetInstructions">Use default</button>
             <button type="button" class="ghost" id="settingsClearInstructions">Clear</button>
           </div>
+        </section>
+        <section class="settings-section settings-panel" data-settings-panel="shortcuts">
+          <p class="settings-section-help">One-click presets that add useful cards to the Todo column.</p>
+          <ul class="shortcut-list" id="settingsShortcutList"></ul>
         </section>
         <section class="settings-section settings-panel" data-settings-panel="appearance">
           <p class="settings-section-help">Choose how the board looks. Auto matches your operating system.</p>
@@ -1610,7 +1797,7 @@ export function renderAppShell(options: AppShellOptions): string {
           <textarea id="settingsRawMarkdown" class="card-dialog-description raw-content" readonly aria-label="Raw markdown content" placeholder="Loading…"></textarea>
         </section>
         <section class="settings-section settings-panel" data-settings-panel="sounds">
-          <p class="settings-section-help">Play a small sound when a card moves into Doing or Done. Off by default.</p>
+          <p class="settings-section-help">Play a small sound when a card moves into Doing or Done. On by default.</p>
           <label class="settings-toggle">
             <input type="checkbox" id="settingsSoundsToggle" />
             <span class="settings-toggle-label">Enable move sounds</span>
@@ -1618,6 +1805,20 @@ export function renderAppShell(options: AppShellOptions): string {
           <div class="settings-actions" style="justify-content: flex-start">
             <button type="button" class="ghost" id="settingsSoundsPreviewDoing">Preview Doing</button>
             <button type="button" class="ghost" id="settingsSoundsPreviewDone">Preview Done</button>
+          </div>
+        </section>
+        <section class="settings-section settings-panel" data-settings-panel="advanced">
+          <p class="settings-section-help">Experimental features, off by default. These can take destructive actions on your behalf.</p>
+          <label class="settings-toggle">
+            <input type="checkbox" id="settingsYoloToggle" />
+            <span class="settings-toggle-label">Enable yolo features</span>
+          </label>
+          <div class="settings-yolo-options" id="settingsYoloOptions" hidden>
+            <label class="settings-field">
+              <span class="settings-field-label">Agent command</span>
+              <input type="text" id="settingsAgentCommand" class="settings-field-input" placeholder="claude" autocomplete="off" spellcheck="false" />
+              <span class="settings-field-help">Shell command run when "Implement now" is clicked. Examples: <code>claude -p</code>, <code>codex</code>.</span>
+            </label>
           </div>
         </section>
         <section class="settings-section settings-panel" data-settings-panel="about">
@@ -1721,6 +1922,7 @@ export function renderAppShell(options: AppShellOptions): string {
         }
         state.fileVersion = null;
         state.isDirty = false;
+        if (typeof loadSoundsPreference === "function") loadSoundsPreference();
         loadBoard("switch");
       });
     }
@@ -2019,6 +2221,7 @@ export function renderAppShell(options: AppShellOptions): string {
             else if (title === "done") playMoveDoneSound();
           }
         }
+        checkCompletionTransition();
       }
     });
 
@@ -2069,6 +2272,8 @@ export function renderAppShell(options: AppShellOptions): string {
         applyBoardChrome();
         renderBoard();
         if (reason === "external") playSoundsForBoardDiff(prevColumnsByCard, state.board);
+        if (reason === "switch") _wasTodoDoingEmpty = isTodoDoingEmpty(state.board);
+        else checkCompletionTransition();
         setStatus(reason === "external" ? "Reloaded from disk" : "Saved", "saved");
       } catch (error) {
         console.error(error);
@@ -2102,6 +2307,7 @@ export function renderAppShell(options: AppShellOptions): string {
           applyBoardChrome();
           renderBoard();
           playSoundsForBoardDiff(prevColumnsByCard, state.board);
+          checkCompletionTransition();
           setStatus("Merged disk changes", "saved");
           // Push the merged result back so disk and ui converge.
           scheduleSave();
@@ -2113,6 +2319,7 @@ export function renderAppShell(options: AppShellOptions): string {
           applyBoardChrome();
           renderBoard();
           playSoundsForBoardDiff(prevColumnsByCard, state.board);
+          checkCompletionTransition();
           setStatus("Reloaded from disk", "saved");
         }
       } catch (error) {
@@ -2669,8 +2876,11 @@ export function renderAppShell(options: AppShellOptions): string {
     const settingsHeading = document.querySelector("[data-settings-heading]");
     const settingsTabLabels = {
       instructions: "Instructions",
+      shortcuts: "Shortcuts",
+      appearance: "Appearance",
       markdown: "Markdown",
       sounds: "Sounds",
+      advanced: "Advanced",
       about: "About"
     };
     settingsTabButtons.forEach((btn) => {
@@ -2682,6 +2892,166 @@ export function renderAppShell(options: AppShellOptions): string {
         if (settingsHeading) settingsHeading.textContent = settingsTabLabels[tab] || tab;
       });
     });
+
+    const shortcutPresets = [
+      {
+        id: "package-json",
+        title: "Add to package.json",
+        help: "Adds a Todo card to wire npx kanban-cli@latest into package.json scripts.",
+        cardTitle: "Add npm script for kanban",
+        cardDescription: (fileName) =>
+          'Add a "kanban" script to package.json that runs npx kanban-cli@latest ' + fileName + ' so the board can be opened with npm run kanban.'
+      }
+    ];
+
+    function renderShortcutList() {
+      const list = document.querySelector("#settingsShortcutList");
+      if (!list) return;
+      list.innerHTML = "";
+      for (const preset of shortcutPresets) {
+        const item = document.createElement("li");
+        item.className = "shortcut-item";
+
+        const iconEl = document.createElement("span");
+        iconEl.className = "shortcut-item-icon";
+        iconEl.innerHTML = icons.zap;
+        item.appendChild(iconEl);
+
+        const body = document.createElement("div");
+        body.className = "shortcut-item-body";
+        const title = document.createElement("p");
+        title.className = "shortcut-item-title";
+        title.textContent = preset.title;
+        const help = document.createElement("p");
+        help.className = "shortcut-item-help";
+        help.textContent = preset.help;
+        body.append(title, help);
+        item.appendChild(body);
+
+        const action = document.createElement("button");
+        action.type = "button";
+        action.className = "shortcut-item-action";
+        action.innerHTML = icons.plus + "<span>Add to Todo</span>";
+        action.addEventListener("click", () => addShortcutCard(preset, action));
+        item.appendChild(action);
+
+        list.appendChild(item);
+      }
+    }
+
+    function addShortcutCard(preset, buttonEl) {
+      const todo = state.board.columns.find((c) => (c.title || "").trim().toLowerCase() === "todo")
+        || state.board.columns[0];
+      if (!todo) {
+        setStatus("No Todo column found", "error");
+        return;
+      }
+      const description = typeof preset.cardDescription === "function"
+        ? preset.cardDescription(state.fileName || "TODO.md")
+        : preset.cardDescription;
+      const card = {
+        id: createId("card"),
+        title: preset.cardTitle,
+        description: description || "",
+        done: false
+      };
+      todo.cards.push(card);
+      renderBoard();
+      saveNow();
+      flashCopyButton(buttonEl);
+      setStatus("Card added to Todo", "saved");
+      checkCompletionTransition();
+    }
+
+    renderShortcutList();
+
+    const YOLO_PREF_KEY = "kanban-cli:yolo-enabled";
+    const AGENT_COMMAND_KEY = "kanban-cli:agent-command";
+    const DEFAULT_AGENT_COMMAND = "claude -p";
+    let yoloEnabled = false;
+    let agentCommand = DEFAULT_AGENT_COMMAND;
+    try {
+      yoloEnabled = window.localStorage?.getItem(YOLO_PREF_KEY) === "1";
+      const storedCmd = window.localStorage?.getItem(AGENT_COMMAND_KEY);
+      if (typeof storedCmd === "string" && storedCmd.trim()) agentCommand = storedCmd;
+    } catch (_) { /* ignore */ }
+
+    const yoloToggleEl = document.querySelector("#settingsYoloToggle");
+    const yoloOptionsEl = document.querySelector("#settingsYoloOptions");
+    const agentCommandInputEl = document.querySelector("#settingsAgentCommand");
+    if (yoloToggleEl && yoloOptionsEl && agentCommandInputEl) {
+      yoloToggleEl.checked = yoloEnabled;
+      yoloOptionsEl.hidden = !yoloEnabled;
+      agentCommandInputEl.value = agentCommand;
+      yoloToggleEl.addEventListener("change", () => {
+        yoloEnabled = yoloToggleEl.checked;
+        try { window.localStorage?.setItem(YOLO_PREF_KEY, yoloEnabled ? "1" : "0"); } catch (_) { /* ignore */ }
+        yoloOptionsEl.hidden = !yoloEnabled;
+        applyYoloVisibility();
+      });
+      agentCommandInputEl.addEventListener("change", () => {
+        const value = agentCommandInputEl.value.trim();
+        agentCommand = value || DEFAULT_AGENT_COMMAND;
+        try {
+          if (value) window.localStorage?.setItem(AGENT_COMMAND_KEY, value);
+          else window.localStorage?.removeItem(AGENT_COMMAND_KEY);
+        } catch (_) { /* ignore */ }
+      });
+    }
+
+    function applyYoloVisibility() {
+      document.querySelectorAll("[data-yolo-only]").forEach((el) => {
+        el.hidden = !yoloEnabled;
+      });
+    }
+    applyYoloVisibility();
+
+    function buildImplementPrompt() {
+      const parts = [];
+      const instructions = (state.board.instructions ?? "").trim();
+      if (instructions) parts.push(instructions);
+      parts.push("Work through every item in the Todo column one at a time, moving each into Doing before starting and to the top of Done when finished. Keep going to the next Todo item without stopping; only stop when the Todo column is empty.");
+      parts.push("Board file: " + state.filePath);
+      return parts.join("\\n\\n");
+    }
+
+    const implementNowBtn = document.querySelector("#implementNowBtn");
+    if (implementNowBtn) {
+      implementNowBtn.addEventListener("click", async () => {
+        if (!yoloEnabled) return;
+        const command = (agentCommand || DEFAULT_AGENT_COMMAND).trim();
+        if (!command) {
+          setStatus("Set an agent command in Settings → Advanced", "error");
+          return;
+        }
+        const prompt = buildImplementPrompt();
+        implementNowBtn.disabled = true;
+        setStatus("Starting agent in CLI…", "saving");
+        try {
+          const response = await fetch("/api/agent/run" + boardQuery(), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ command, prompt })
+          });
+          if (!response.ok) {
+            let message = "Agent failed to start";
+            try {
+              const data = await response.json();
+              if (data && data.error) message = String(data.error);
+            } catch (_) { /* ignore */ }
+            throw new Error(message);
+          }
+          flashCopyButton(implementNowBtn);
+          setStatus("Agent started — watch the CLI for output", "saved");
+        } catch (error) {
+          console.error(error);
+          const message = error && error.message ? error.message : String(error);
+          setStatus("Agent failed: " + message, "error");
+        } finally {
+          implementNowBtn.disabled = false;
+        }
+      });
+    }
 
     const THEME_PREF_KEY = "kanban-cli:theme-mode";
     function getThemeMode() {
@@ -2737,17 +3107,27 @@ export function renderAppShell(options: AppShellOptions): string {
       else if (mq.addListener) mq.addListener(onSystemChange);
     } catch (_) { /* ignore */ }
 
-    const SOUND_PREF_KEY = "kanban-cli:sounds-enabled";
-    let soundsEnabled = false;
-    try {
-      soundsEnabled = window.localStorage?.getItem(SOUND_PREF_KEY) === "1";
-    } catch (_) { /* localStorage unavailable */ }
+    const SOUND_PREF_KEY_PREFIX = "kanban-cli:sounds-enabled:";
+    function soundPrefKey() {
+      return SOUND_PREF_KEY_PREFIX + (state.filePath || state.fileName || "default");
+    }
+    let soundsEnabled = true;
+    function loadSoundsPreference() {
+      let next = true;
+      try {
+        const stored = window.localStorage?.getItem(soundPrefKey());
+        if (stored !== null && stored !== undefined) next = stored === "1";
+      } catch (_) { /* localStorage unavailable */ }
+      soundsEnabled = next;
+      if (soundsToggleEl) soundsToggleEl.checked = soundsEnabled;
+    }
     const soundsToggleEl = document.querySelector("#settingsSoundsToggle");
     soundsToggleEl.checked = soundsEnabled;
     soundsToggleEl.addEventListener("change", () => {
       soundsEnabled = soundsToggleEl.checked;
-      try { window.localStorage?.setItem(SOUND_PREF_KEY, soundsEnabled ? "1" : "0"); } catch (_) { /* ignore */ }
+      try { window.localStorage?.setItem(soundPrefKey(), soundsEnabled ? "1" : "0"); } catch (_) { /* ignore */ }
     });
+    loadSoundsPreference();
 
     let _audioCtx = null;
     function getAudioCtx() {
@@ -2777,14 +3157,82 @@ export function renderAppShell(options: AppShellOptions): string {
 
     function playMoveDoingSound() {
       if (!soundsEnabled) return;
-      playTone(560, 0.14, 0.08, "sine");
+      playTone(560, 0.14, 0.16, "sine");
     }
 
     function playMoveDoneSound() {
       if (!soundsEnabled) return;
-      // Two ascending tones — a check/success cue.
-      playTone(660, 0.10, 0.08, "sine");
-      setTimeout(() => playTone(990, 0.20, 0.10, "sine"), 90);
+      playTone(660, 0.10, 0.18, "sine");
+      setTimeout(() => playTone(990, 0.20, 0.22, "sine"), 90);
+    }
+
+    function playCompletionSound() {
+      if (!soundsEnabled) return;
+      const notes = [523.25, 659.25, 783.99, 1046.5];
+      notes.forEach((freq, i) => {
+        setTimeout(() => playTone(freq, 0.22, 0.24, "triangle"), i * 110);
+      });
+    }
+
+    function showConfetti() {
+      try {
+        if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      } catch (_) { /* ignore */ }
+      const colors = ["#0c66e4", "#1f845a", "#c9372c", "#f08c00", "#5e4db2", "#e774bb", "#f5cd47", "#4bce97"];
+      const layer = document.createElement("div");
+      layer.className = "confetti-layer";
+      layer.setAttribute("aria-hidden", "true");
+      const total = 110;
+      for (let i = 0; i < total; i += 1) {
+        const piece = document.createElement("span");
+        piece.className = "confetti-piece";
+        const size = 6 + Math.random() * 7;
+        const isStrip = Math.random() < 0.6;
+        const drift = (Math.random() - 0.5) * 360;
+        const spin = (Math.random() - 0.5) * 1080;
+        const duration = 2200 + Math.random() * 1800;
+        const delay = Math.random() * 350;
+        piece.style.left = (Math.random() * 100) + "vw";
+        piece.style.width = size + "px";
+        piece.style.height = (isStrip ? size * 0.4 : size) + "px";
+        piece.style.background = colors[i % colors.length];
+        piece.style.borderRadius = isStrip ? "1px" : "50%";
+        piece.style.setProperty("--confetti-drift", drift + "px");
+        piece.style.setProperty("--confetti-spin", spin + "deg");
+        piece.style.setProperty("--confetti-duration", duration + "ms");
+        piece.style.setProperty("--confetti-delay", delay + "ms");
+        layer.appendChild(piece);
+      }
+      document.body.appendChild(layer);
+      setTimeout(() => layer.remove(), 5000);
+    }
+
+    function isTodoDoingEmpty(board) {
+      if (!board || !board.columns) return false;
+      let todoCount = 0;
+      let doingCount = 0;
+      let doneCount = 0;
+      let hasTodo = false;
+      let hasDoing = false;
+      for (const col of board.columns) {
+        const t = (col.title || "").trim().toLowerCase();
+        if (t === "todo") { hasTodo = true; todoCount += (col.cards || []).length; }
+        else if (t === "doing") { hasDoing = true; doingCount += (col.cards || []).length; }
+        else if (t === "done") { doneCount += (col.cards || []).length; }
+      }
+      if (!hasTodo && !hasDoing) return false;
+      return todoCount === 0 && doingCount === 0 && doneCount > 0;
+    }
+
+    let _wasTodoDoingEmpty = null;
+    function checkCompletionTransition() {
+      const empty = isTodoDoingEmpty(state.board);
+      const becameEmpty = _wasTodoDoingEmpty === false && empty === true;
+      _wasTodoDoingEmpty = empty;
+      if (becameEmpty) {
+        playCompletionSound();
+        showConfetti();
+      }
     }
 
     function cardColumnTitleMap(board) {
@@ -2813,12 +3261,11 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     document.querySelector("#settingsSoundsPreviewDoing").addEventListener("click", () => {
-      // Preview ignores the enabled flag so the user can hear before turning it on.
-      playTone(560, 0.14, 0.08, "sine");
+      playTone(560, 0.14, 0.16, "sine");
     });
     document.querySelector("#settingsSoundsPreviewDone").addEventListener("click", () => {
-      playTone(660, 0.10, 0.08, "sine");
-      setTimeout(() => playTone(990, 0.20, 0.10, "sine"), 90);
+      playTone(660, 0.10, 0.18, "sine");
+      setTimeout(() => playTone(990, 0.20, 0.22, "sine"), 90);
     });
 
     settingsInstructionsEl.addEventListener("input", () => {
@@ -2906,6 +3353,7 @@ export function renderAppShell(options: AppShellOptions): string {
       renderBoard();
       focusCard(card.id);
       saveNow();
+      checkCompletionTransition();
     }
 
     function deleteColumn(columnId) {
@@ -2928,6 +3376,7 @@ export function renderAppShell(options: AppShellOptions): string {
       column.cards = column.cards.filter((item) => item.id !== cardId);
       renderBoard();
       saveNow();
+      checkCompletionTransition();
     }
 
     function syncStateFromDom() {

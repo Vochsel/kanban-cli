@@ -15,6 +15,7 @@
   "scripts": {
     "build": "bun build ./src/cli.ts --target=bun --outfile=dist/cli.js",
     "dev": "sh -c 'bun --watch ./src/cli.ts \"${1:-./examples/basic.md}\" --no-open' --",
+    "run kanban": "npx kanban-cli@latest docs/features.md",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "prepack": "bun run build"

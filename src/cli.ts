@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { startKanbanServer, type RunningServer } from "./server";
 
@@ -24,6 +24,8 @@ async function main(args: string[] = Bun.argv.slice(2)): Promise<void> {
   }
 
   const running = await startWithPortFallback(options);
+
+  setTerminalTitle(buildTitle(running.filePaths));
 
   const version = await packageVersion();
   const fileLines = running.filePaths.map((p, i) => `  ${i === 0 ? "›" : " "} ${p}`).join("\n");
@@ -131,7 +133,26 @@ async function openBrowser(url: string): Promise<void> {
 
 function stop(running: RunningServer): never {
   running.server.stop(true);
+  resetTerminalTitle();
   process.exit(0);
+}
+
+function buildTitle(filePaths: string[]): string {
+  if (filePaths.length === 0) return "kanban-cli";
+  if (filePaths.length === 1) return `${basename(filePaths[0]!)} — kanban-cli`;
+  return `${basename(filePaths[0]!)} +${filePaths.length - 1} — kanban-cli`;
+}
+
+function setTerminalTitle(title: string): void {
+  if (!process.stdout.isTTY) return;
+  // OSC sequence: ESC ] 0 ; <title> BEL — sets both icon and window/tab title.
+  const safe = title.replace(/[\x00-\x1f\x7f]/g, " ");
+  process.stdout.write(`\x1b]0;${safe}\x07`);
+}
+
+function resetTerminalTitle(): void {
+  if (!process.stdout.isTTY) return;
+  process.stdout.write(`\x1b]0;\x07`);
 }
 
 async function packageVersion(): Promise<string> {

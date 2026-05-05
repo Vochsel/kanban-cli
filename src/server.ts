@@ -115,6 +115,39 @@ export async function startKanbanServer(options: ServerOptions): Promise<Running
           return json({ id: entry.id, board, fileName: entry.fileName, filePath: entry.filePath, version });
         }
 
+        if (url.pathname === "/api/agent/run" && request.method === "POST") {
+          const entry = resolveBoard(url);
+          const body = (await request.json().catch(() => ({}))) as { command?: unknown; prompt?: unknown };
+          const command = typeof body.command === "string" ? body.command.trim() : "";
+          const prompt = typeof body.prompt === "string" ? body.prompt : "";
+          if (!command) return json({ error: "command is required" }, 400);
+          if (!prompt.trim()) return json({ error: "prompt is required" }, 400);
+
+          const args = parseShellWords(command);
+          if (args.length === 0) return json({ error: "command is empty after parsing" }, 400);
+          args.push(prompt);
+
+          const label = entry ? entry.fileName : "kanban";
+          console.log(`\n[agent] launching: ${args[0]} (board: ${label})`);
+          let proc: Bun.Subprocess;
+          try {
+            proc = Bun.spawn(args, {
+              stdout: "inherit",
+              stderr: "inherit",
+              stdin: "ignore",
+              cwd: entry ? dirname(entry.filePath) : creationDir
+            });
+          } catch (error) {
+            const message = error instanceof Error ? error.message : "Failed to spawn";
+            return json({ error: message }, 500);
+          }
+          const pid = proc.pid;
+          proc.exited.then((code) => {
+            console.log(`[agent] exited (pid ${pid}) with code ${code}`);
+          });
+          return json({ ok: true, pid });
+        }
+
         if (url.pathname === "/healthz" && request.method === "GET") {
           const versions: Record<string, string> = {};
           for (const b of boards) versions[b.id] = await fileVersion(b.filePath);
@@ -219,4 +252,15 @@ function html(body: string): Response {
       "Content-Type": "text/html; charset=utf-8"
     }
   });
+}
+
+function parseShellWords(input: string): string[] {
+  const tokens: string[] = [];
+  const re = /"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)'|(\S+)/g;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(input)) !== null) {
+    const value = match[1] ?? match[2] ?? match[3] ?? "";
+    tokens.push(value.replace(/\\(.)/g, "$1"));
+  }
+  return tokens;
 }
