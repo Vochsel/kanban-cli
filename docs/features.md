@@ -9,6 +9,8 @@ When working through tasks here, always follow these defaults and check after st
 - When you complete a task, move it to the top of the "Done" section header (sort by most recent at top of list)
 - Keep going forever until all todo's are done
 
+Once you are completely done, push all changes to main
+
 # Backlog <!-- icon: calendar -->
 - [ ] Potentially support yaml in parallel
 - [ ] Add labels/category support for cards
@@ -19,8 +21,14 @@ When working through tasks here, always follow these defaults and check after st
 # Doing <!-- icon: play -->
 
 # Done <!-- icon: double-tick -->
+- [x] set the opengraph image dynamically of www homepage to advertise the simple npx command and icon etc
+- [x] on www, the shape of a board section, arrow should be two ways you can edit text or ui
+- [x] $npx kanban-cli@latest board.md on homepage should copy to clipboard: you did this, but it needs to use a toast for copied to clipboard not change pill contents
+- [x] v0.2.4 · open source · Apache-2.0 on www homepage should link to license on github - whole pill
+- [x] on settings markdown file, raw markdown should be shown on tab open - not a button "View raw markdown"
+- [x] appearance icons in settings dialog arent centered buttons
+- [x] make settings dialog taller
 - [x] make sure if run with no markdown file, the web ui still opens, but with a button offering to create TODO.md or explaining to rerun with 1 or more md files in cli args
-- [x] $npx kanban-cli@latest board.md on homepage should copy to clipboard
 - [x] Make sure sounds play even when disk updates trigger movement
 - [x] Make version v0.2.4
 - [x] add a changelog to the www page, and update dynamically based on git history, but human readable: stylize visually as its own kanban board, but columns per date released

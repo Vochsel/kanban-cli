@@ -206,6 +206,35 @@ footer {
   color: var(--green);
 }
 
+.toast {
+  background: var(--ink);
+  border-radius: 999px;
+  bottom: 32px;
+  box-shadow: 0 10px 30px rgba(15, 15, 15, 0.18), 0 1px 2px rgba(15, 15, 15, 0.1);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  left: 50%;
+  letter-spacing: -0.005em;
+  opacity: 0;
+  padding: 10px 18px;
+  pointer-events: none;
+  position: fixed;
+  transform: translate(-50%, 12px);
+  transition: opacity 180ms ease, transform 180ms ease;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+.toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.toast[data-variant="error"] {
+  background: #b91c1c;
+}
+
 .btn-icon {
   align-items: center;
   display: inline-flex;
@@ -254,6 +283,13 @@ main {
   font-weight: 500;
   letter-spacing: 0.02em;
   padding: 5px 12px;
+  text-decoration: none;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+a.eyebrow:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
 }
 
 .hero h1 {
@@ -895,7 +931,8 @@ section {
 
 .format-arrow {
   color: var(--muted-soft);
-  font-size: 28px;
+  font-size: 36px;
+  line-height: 1;
 }
 
 .format-render {

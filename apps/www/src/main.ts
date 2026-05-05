@@ -707,26 +707,38 @@ async function copyText(text: string): Promise<void> {
   ta.remove();
 }
 
+let toastEl: HTMLDivElement | null = null;
+let toastTimer: number | undefined;
+
+function showToast(message: string, variant: "success" | "error" = "success"): void {
+  if (!toastEl) {
+    toastEl = document.createElement("div");
+    toastEl.className = "toast";
+    toastEl.setAttribute("role", "status");
+    toastEl.setAttribute("aria-live", "polite");
+    document.body.appendChild(toastEl);
+  }
+  toastEl.textContent = message;
+  toastEl.dataset.variant = variant;
+  toastEl.classList.add("is-visible");
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => {
+    toastEl?.classList.remove("is-visible");
+  }, 1800);
+}
+
 function setupCopyCliCommand(): void {
   const buttons = document.querySelectorAll<HTMLButtonElement>("[data-copy-cli-command]");
   buttons.forEach((btn) => {
     const command = btn.dataset.cliCommand?.trim();
     if (!command) return;
-    const label = btn.querySelector<HTMLElement>("[data-copy-cli-command-label]");
     btn.addEventListener("click", async () => {
       try {
         await copyText(command);
-        if (!label) return;
-        const original = label.textContent;
-        label.textContent = "Copied to clipboard";
-        btn.classList.add("is-copied");
-        setTimeout(() => {
-          label.textContent = original;
-          btn.classList.remove("is-copied");
-        }, 1600);
+        showToast("Copied — paste it in a terminal");
       } catch (err) {
         console.error(err);
-        if (label) label.textContent = "Copy failed";
+        showToast("Copy failed", "error");
       }
     });
   });
@@ -734,8 +746,7 @@ function setupCopyCliCommand(): void {
 
 function setupCopyAiPrompt(): void {
   const btn = document.querySelector<HTMLButtonElement>("[data-copy-ai-prompt]");
-  const label = document.querySelector<HTMLElement>("[data-copy-ai-prompt-label]");
-  if (!btn || !label) return;
+  if (!btn) return;
 
   const prompt = [
     "Set up a kanban board for this project using kanban-cli (https://github.com/Vochsel/kanban-cli).",
@@ -756,28 +767,11 @@ function setupCopyAiPrompt(): void {
 
   btn.addEventListener("click", async () => {
     try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(prompt);
-      } else {
-        const ta = document.createElement("textarea");
-        ta.value = prompt;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        ta.remove();
-      }
-      const original = label.textContent;
-      label.textContent = "Copied — paste in your AI tool";
-      btn.classList.add("is-copied");
-      setTimeout(() => {
-        label.textContent = original;
-        btn.classList.remove("is-copied");
-      }, 1800);
+      await copyText(prompt);
+      showToast("Copied — paste in your AI tool");
     } catch (err) {
       console.error(err);
-      label.textContent = "Copy failed";
+      showToast("Copy failed", "error");
     }
   });
 }

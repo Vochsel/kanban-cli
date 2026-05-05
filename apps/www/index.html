@@ -4,9 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>kanban-cli — markdown kanban boards in your terminal</title>
-    <meta name="description" content="A tiny Bun-powered CLI that turns a markdown file into a local Trello-style kanban board." />
+    <meta name="description" content="A tiny CLI that turns any markdown file into a local, drag-and-drop kanban board. No install, no database — just one npx command." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="#0a0a0a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kanban-cli.vochsel.com" />
+    <meta property="og:title" content="kanban-cli — a kanban ui for your markdown file" />
+    <meta property="og:description" content="$ npx kanban-cli@latest board.md — open any markdown file as a local, drag-and-drop kanban board. The file stays the source of truth." />
+    <meta property="og:image" content="https://kanban-cli.vochsel.com/og.svg" />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="kanban-cli — a kanban ui for your markdown file" />
+    <meta name="twitter:description" content="$ npx kanban-cli@latest board.md — open any markdown file as a local, drag-and-drop kanban board." />
+    <meta name="twitter:image" content="https://kanban-cli.vochsel.com/og.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -45,7 +57,7 @@
 
     <main>
       <section class="hero">
-        <span class="eyebrow">v0.2.4 · open source · Apache-2.0</span>
+        <a class="eyebrow" href="https://github.com/Vochsel/kanban-cli/blob/main/LICENSE" target="_blank" rel="noopener">v0.2.4 · open source · Apache-2.0</a>
         <h1>
           <span class="hero-line">A kanban ui</span>
           <span class="hero-line hl">for your markdown file</span>
@@ -190,7 +202,7 @@
         <p class="section-lede">Headings turn into columns. Checkbox lines turn into cards. Edit either side — they stay in sync.</p>
         <div class="format-grid">
           <textarea class="format-pre" data-md-source spellcheck="false" aria-label="Markdown source"></textarea>
-          <div class="format-arrow" aria-hidden="true">→</div>
+          <div class="format-arrow" aria-hidden="true" title="Two-way sync">⇌</div>
           <div class="format-render">
             <div class="kp-board kp-board-mini" data-board="format"></div>
           </div>
