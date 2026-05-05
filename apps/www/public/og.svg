@@ -3,9 +3,9 @@
     <pattern id="dot-grid" width="22" height="22" patternUnits="userSpaceOnUse">
       <circle cx="1" cy="1" r="1" fill="rgba(15, 15, 15, 0.08)"/>
     </pattern>
-    <linearGradient id="hl" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="hl" x1="0" y1="0" x2="1" y2="0.6">
       <stop offset="0%" stop-color="#0c66e4"/>
-      <stop offset="60%" stop-color="#6e5dc6"/>
+      <stop offset="55%" stop-color="#6e5dc6"/>
       <stop offset="100%" stop-color="#1f845a"/>
     </linearGradient>
   </defs>
@@ -13,22 +13,33 @@
   <rect width="1200" height="630" fill="#fafafa"/>
   <rect width="1200" height="630" fill="url(#dot-grid)"/>
 
-  <g transform="translate(96 96)">
-    <rect width="80" height="80" rx="18" fill="#0a0a0a"/>
-    <rect x="17" y="20" width="10" height="32" rx="4" fill="#ffffff"/>
-    <rect x="35" y="20" width="10" height="20" rx="4" fill="#ffffff"/>
-    <rect x="53" y="20" width="10" height="40" rx="4" fill="#ffffff"/>
+  <!-- Brand row -->
+  <g transform="translate(72 64)">
+    <rect width="56" height="56" rx="14" fill="#0a0a0a"/>
+    <rect x="12" y="14" width="7" height="22" rx="3" fill="#ffffff"/>
+    <rect x="24.5" y="14" width="7" height="14" rx="3" fill="#ffffff"/>
+    <rect x="37" y="14" width="7" height="28" rx="3" fill="#ffffff"/>
   </g>
-  <text x="200" y="156" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="44" fill="#0a0a0a" letter-spacing="-0.02em">kanban-cli</text>
+  <text x="146" y="106" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="32" fill="#0a0a0a" letter-spacing="-0.02em">kanban-cli</text>
 
-  <text x="96" y="320" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="84" fill="#0a0a0a" letter-spacing="-0.035em">A kanban ui</text>
-  <text x="96" y="416" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="84" fill="url(#hl)" letter-spacing="-0.035em">for your markdown file.</text>
+  <!-- Headline -->
+  <text x="72" y="270" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="96" fill="#0a0a0a" letter-spacing="-0.04em">A kanban ui</text>
+  <text x="72" y="380" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="96" fill="url(#hl)" letter-spacing="-0.04em">for your markdown file.</text>
 
-  <g transform="translate(96 510)">
-    <rect width="640" height="68" rx="34" fill="#0a0a0a"/>
-    <text x="32" y="44" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="24" fill="rgba(255, 255, 255, 0.55)">$</text>
-    <text x="58" y="44" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="24" fill="#ffffff" letter-spacing="-0.005em">npx kanban-cli@latest board.md</text>
+  <!-- Subheadline / supporting copy -->
+  <text x="72" y="440" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="500" font-size="26" fill="#666666" letter-spacing="-0.005em">No install. No database. Just one command — the markdown file is the source of truth.</text>
+
+  <!-- CTA pill -->
+  <g transform="translate(72 506)">
+    <rect width="780" height="76" rx="38" fill="#0a0a0a"/>
+    <text x="36" y="51" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="28" fill="rgba(255, 255, 255, 0.55)">$</text>
+    <text x="62" y="51" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="28" fill="#ffffff" letter-spacing="-0.005em">npx kanban-cli@latest board.md</text>
+    <g transform="translate(640 28)">
+      <rect width="120" height="32" rx="16" fill="rgba(255, 255, 255, 0.16)"/>
+      <text x="60" y="22" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="14" fill="#ffffff" text-anchor="middle">Try it →</text>
+    </g>
   </g>
 
-  <text x="1104" y="588" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" fill="#666666" text-anchor="end">kanban-cli.vochsel.com</text>
+  <!-- URL -->
+  <text x="1128" y="592" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" fill="#666666" text-anchor="end">kanban-cli.vochsel.com</text>
 </svg>
