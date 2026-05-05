@@ -1834,14 +1834,19 @@ export function renderAppShell(options: AppShellOptions): string {
           <textarea id="settingsRawMarkdown" class="card-dialog-description raw-content" readonly aria-label="Raw markdown content" placeholder="Loading…"></textarea>
         </section>
         <section class="settings-section settings-panel" data-settings-panel="sounds">
-          <p class="settings-section-help">Play a small sound when a card moves into Doing or Done. On by default.</p>
+          <p class="settings-section-help">Sounds and confetti for card movement and completion. On by default.</p>
           <label class="settings-toggle">
             <input type="checkbox" id="settingsSoundsToggle" />
-            <span class="settings-toggle-label">Enable move sounds</span>
+            <span class="settings-toggle-label">Enable sounds</span>
+          </label>
+          <label class="settings-toggle">
+            <input type="checkbox" id="settingsConfettiToggle" />
+            <span class="settings-toggle-label">Show confetti on completion</span>
           </label>
           <div class="settings-actions" style="justify-content: flex-start">
             <button type="button" class="ghost" id="settingsSoundsPreviewDoing">Preview Doing</button>
             <button type="button" class="ghost" id="settingsSoundsPreviewDone">Preview Done</button>
+            <button type="button" class="ghost" id="settingsSoundsPreviewComplete">Preview Complete</button>
           </div>
         </section>
         <section class="settings-section settings-panel" data-settings-panel="advanced">
@@ -2475,6 +2480,8 @@ export function renderAppShell(options: AppShellOptions): string {
       document.title = display + " - kanban-cli";
     }
 
+    let currentAccent = null;
+
     function applyTheme(color) {
       const root = document.documentElement.style;
       const hex = normalizeHex(color);
@@ -2486,18 +2493,29 @@ export function renderAppShell(options: AppShellOptions): string {
         root.removeProperty("--column-bg");
         root.removeProperty("--column-bg-hover");
         themeSwatchEl.style.removeProperty("background");
+        currentAccent = null;
         return;
       }
+      currentAccent = hex;
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
       const r = parseInt(hex.slice(1, 3), 16);
       const g = parseInt(hex.slice(3, 5), 16);
       const b = parseInt(hex.slice(5, 7), 16);
-      const strong = darken(r, g, b, 0.7);
-      root.setProperty("--accent", hex);
-      root.setProperty("--accent-strong", strong);
-      root.setProperty("--accent-soft", "rgba(" + r + ", " + g + ", " + b + ", 0.12)");
-      root.setProperty("--bg", tint(r, g, b, 0.06));
-      root.setProperty("--column-bg", tint(r, g, b, 0.14));
-      root.setProperty("--column-bg-hover", tint(r, g, b, 0.2));
+      if (isDark) {
+        root.setProperty("--accent", lighten(r, g, b, 0.4));
+        root.setProperty("--accent-strong", lighten(r, g, b, 0.6));
+        root.setProperty("--accent-soft", "rgba(" + r + ", " + g + ", " + b + ", 0.22)");
+        root.setProperty("--bg", shade(r, g, b, 0.08));
+        root.setProperty("--column-bg", shade(r, g, b, 0.18));
+        root.setProperty("--column-bg-hover", shade(r, g, b, 0.26));
+      } else {
+        root.setProperty("--accent", hex);
+        root.setProperty("--accent-strong", darken(r, g, b, 0.7));
+        root.setProperty("--accent-soft", "rgba(" + r + ", " + g + ", " + b + ", 0.12)");
+        root.setProperty("--bg", tint(r, g, b, 0.06));
+        root.setProperty("--column-bg", tint(r, g, b, 0.14));
+        root.setProperty("--column-bg-hover", tint(r, g, b, 0.2));
+      }
       themeSwatchEl.style.background = hex;
     }
 
@@ -2507,6 +2525,24 @@ export function renderAppShell(options: AppShellOptions): string {
       const tb = Math.round(255 - (255 - b) * alpha);
       const hex = (v) => v.toString(16).padStart(2, "0");
       return "#" + hex(tr) + hex(tg) + hex(tb);
+    }
+
+    function shade(r, g, b, alpha) {
+      // Mix the accent into the dark base (#0c0f15). alpha = accent intensity.
+      const baseR = 12, baseG = 15, baseB = 21;
+      const sr = Math.round(baseR + (r - baseR) * alpha);
+      const sg = Math.round(baseG + (g - baseG) * alpha);
+      const sb = Math.round(baseB + (b - baseB) * alpha);
+      const hex = (v) => v.toString(16).padStart(2, "0");
+      return "#" + hex(sr) + hex(sg) + hex(sb);
+    }
+
+    function lighten(r, g, b, factor) {
+      const lr = Math.round(r + (255 - r) * factor);
+      const lg = Math.round(g + (255 - g) * factor);
+      const lb = Math.round(b + (255 - b) * factor);
+      const hex = (v) => v.toString(16).padStart(2, "0");
+      return "#" + hex(lr) + hex(lg) + hex(lb);
     }
 
     function normalizeHex(value) {
@@ -3123,6 +3159,8 @@ export function renderAppShell(options: AppShellOptions): string {
       document.querySelectorAll("input[name='settings-theme-mode']").forEach((input) => {
         input.checked = input.value === mode;
       });
+      // Re-derive accent-driven surface colors so dark mode picks up the right shading.
+      if (currentAccent) applyTheme(currentAccent);
     }
     function setThemeMode(mode) {
       try { window.localStorage?.setItem(THEME_PREF_KEY, mode); } catch (_) { /* ignore */ }
@@ -3149,24 +3187,40 @@ export function renderAppShell(options: AppShellOptions): string {
     } catch (_) { /* ignore */ }
 
     const SOUND_PREF_KEY_PREFIX = "kanban-cli:sounds-enabled:";
+    const CONFETTI_PREF_KEY_PREFIX = "kanban-cli:confetti-enabled:";
     function soundPrefKey() {
       return SOUND_PREF_KEY_PREFIX + (state.filePath || state.fileName || "default");
     }
+    function confettiPrefKey() {
+      return CONFETTI_PREF_KEY_PREFIX + (state.filePath || state.fileName || "default");
+    }
     let soundsEnabled = true;
+    let confettiEnabled = true;
     function loadSoundsPreference() {
-      let next = true;
+      let nextSounds = true;
+      let nextConfetti = true;
       try {
-        const stored = window.localStorage?.getItem(soundPrefKey());
-        if (stored !== null && stored !== undefined) next = stored === "1";
+        const sounds = window.localStorage?.getItem(soundPrefKey());
+        if (sounds !== null && sounds !== undefined) nextSounds = sounds === "1";
+        const confetti = window.localStorage?.getItem(confettiPrefKey());
+        if (confetti !== null && confetti !== undefined) nextConfetti = confetti === "1";
       } catch (_) { /* localStorage unavailable */ }
-      soundsEnabled = next;
+      soundsEnabled = nextSounds;
+      confettiEnabled = nextConfetti;
       if (soundsToggleEl) soundsToggleEl.checked = soundsEnabled;
+      if (confettiToggleEl) confettiToggleEl.checked = confettiEnabled;
     }
     const soundsToggleEl = document.querySelector("#settingsSoundsToggle");
+    const confettiToggleEl = document.querySelector("#settingsConfettiToggle");
     soundsToggleEl.checked = soundsEnabled;
+    confettiToggleEl.checked = confettiEnabled;
     soundsToggleEl.addEventListener("change", () => {
       soundsEnabled = soundsToggleEl.checked;
       try { window.localStorage?.setItem(soundPrefKey(), soundsEnabled ? "1" : "0"); } catch (_) { /* ignore */ }
+    });
+    confettiToggleEl.addEventListener("change", () => {
+      confettiEnabled = confettiToggleEl.checked;
+      try { window.localStorage?.setItem(confettiPrefKey(), confettiEnabled ? "1" : "0"); } catch (_) { /* ignore */ }
     });
     loadSoundsPreference();
 
@@ -3221,6 +3275,7 @@ export function renderAppShell(options: AppShellOptions): string {
     }
 
     function showConfetti() {
+      if (!confettiEnabled) return;
       try {
         if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       } catch (_) { /* ignore */ }
@@ -3329,6 +3384,16 @@ export function renderAppShell(options: AppShellOptions): string {
     document.querySelector("#settingsSoundsPreviewDone").addEventListener("click", () => {
       playTone(660, 0.10, 0.18, "sine");
       setTimeout(() => playTone(990, 0.20, 0.22, "sine"), 90);
+    });
+    document.querySelector("#settingsSoundsPreviewComplete").addEventListener("click", () => {
+      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5, 1568.0, 2093.0];
+      notes.forEach((freq, i) => {
+        const isFinal = i === notes.length - 1;
+        setTimeout(
+          () => playTone(freq, isFinal ? 0.9 : 0.18, isFinal ? 0.4 : 0.32, "triangle"),
+          i * 95
+        );
+      });
     });
 
     settingsInstructionsEl.addEventListener("input", () => {
